@@ -8,6 +8,7 @@ import LabLayout from './pages/laboratory/LabLayout';
 import PtSreach from './pages/reception/PtSreach';
 import PtReg from './pages/reception/PtReg';
 import PtAddOrder from './pages/reception/PtAddOrder';
+import Orders from './pages/reception/Orders';
 
 
 function App() {
@@ -28,7 +29,7 @@ function App() {
             <Route path="/" element={<PtSreach />} />
             <Route path="pt-reg" element={<PtReg/>} />
             <Route path="pt-add-order/:id" element={<PtAddOrder />} />
-            <Route path="orders" element={<h1>Orders Page</h1>} />
+            <Route path="orders" element={<Orders />} />
           
           </Route>
 

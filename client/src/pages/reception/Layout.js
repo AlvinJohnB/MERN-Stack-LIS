@@ -14,12 +14,13 @@ export default function Layout() {
       }}
     >
       <div
-        className="container-fluid m-0 p-0 bg-light shadow"
+        className="container-fluid m-0 p-0 shadow"
         style={{
           maxWidth: '80%',
-          height: '80%',
+          height: 'auto', // allow growth
+          minHeight: '80vh', // optional: ensures it's not too small
           borderRadius: '5px',
-          overflow: 'hidden',
+          backgroundColor: 'rgba(207, 207, 207, 0.9)',
         }}
       >
         {/* Bootstrap Navbar */}
