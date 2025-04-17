@@ -5,6 +5,8 @@ import ProtectedRoute from './components/ProtectedRoute'; // Import ProtectedRou
 import { AuthContext } from './contexts/AuthContext';
 import Layout from './pages/reception/Layout';
 import LabLayout from './pages/laboratory/LabLayout';
+import PtSreach from './pages/reception/PtSreach';
+import PtReg from './pages/reception/PtReg';
 
 
 function App() {
@@ -22,8 +24,8 @@ function App() {
                 <Layout />
               </ProtectedRoute>
           }>
-            <Route path="/" element={<h1>Patient Search</h1>} />
-            <Route path="pt-reg" element={<h1>Patient Registration</h1>} />
+            <Route path="/" element={<PtSreach />} />
+            <Route path="pt-reg" element={<PtReg/>} />
             <Route path="orders" element={<h1>Orders Page</h1>} />
           
           </Route>
