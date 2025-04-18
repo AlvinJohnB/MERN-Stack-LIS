@@ -11,6 +11,7 @@ import PtAddOrder from './pages/reception/PtAddOrder';
 import Orders from './pages/reception/Orders';
 import NotFound from './pages/NotFound';
 import Signup from './pages/Signup';
+import PatientDetails from './pages/reception/PatientDetails';
 
 
 function App() {
@@ -33,6 +34,7 @@ function App() {
             <Route path="pt-reg" element={<PtReg/>} />
             <Route path="pt-add-order/:id" element={<PtAddOrder />} />
             <Route path="orders" element={<Orders />} />
+            <Route path="patient/:id" element={<PatientDetails />} />
           
           </Route>
 

@@ -67,10 +67,65 @@ const PatientRouter = express.Router();
         }
       });
 
+    PatientRouter.get('/details/:id', async (req, res) => {
+        const { id } = req.params;
+    
+        try {
+        const patient = await Model.PatientModel.findOne({ _id: id });
+    
+        if (!patient) {
+            return res.json({ message: 'Patient not found' });
+        }
+    
+        res.json(patient);
+        } catch (error) {
+        res.status(500).json({ error: 'Error fetching patient details' });
+        }
+    });
+
+    PatientRouter.put('/edit/:id', async (req, res) => {
+        const { id } = req.params;
+        const { lastname, firstname, middlename, bday, age, gender, address, phone, idenno } = req.body;
+      
+        try {
+          // Find the existing patient
+          const existingPatient = await Model.PatientModel.findById(id);
+      
+          if (!existingPatient) {
+            return res.json({ errormessage: 'Patient not found' });
+          }
+      
+          // Check if there are changes
+          const isChanged =
+            existingPatient.lastname !== lastname ||
+            existingPatient.firstname !== firstname ||
+            existingPatient.middlename !== middlename ||
+            existingPatient.bday !== bday ||
+            existingPatient.age !== age ||
+            existingPatient.gender !== gender ||
+            existingPatient.address !== address ||
+            existingPatient.phone !== phone ||
+            existingPatient.idenno !== idenno;
+      
+          if (!isChanged) {
+            return res.json({ message: 'No changes detected, proceeding' });
+          }
+      
+          // Update the patient if changes are detected
+          const updatedPatient = await Model.PatientModel.findByIdAndUpdate(
+            id,
+            { lastname, firstname, middlename, bday, age, gender, address, phone, idenno },
+            { new: true } // Return the updated document
+          );
+      
+          res.json({ message: 'Patient updated successfully', patient: updatedPatient });
+        } catch (error) {
+          res.status(500).json({ error: 'Error updating patient details' });
+        }
+      });
     
     
     // AuthRouter.post('/add-multiple-products', addMultipleProducts);
-
     // AuthRouter.get('/fetch-products', fetchProducts);
     // AuthRouter.post('/add-category', addCategory);
     // AuthRouter.get('/fetch-category', fetchCategories);

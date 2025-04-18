@@ -7,6 +7,7 @@ export const AuthContext = createContext();
 
 // AuthProvider component
 export const AuthProvider = ({ children }) => {
+  
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // Check for an existing session cookie on component mount

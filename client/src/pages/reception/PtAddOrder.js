@@ -1,12 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useParams } from 'react-router-dom';
 import TestsModal from './modals/TestsModal';
 import Spinner from 'react-bootstrap/Spinner';
+import axios from 'axios';
+import Cookies from 'js-cookie'; // Import js-cookie
+import { jwtDecode } from 'jwt-decode';
 
 
 export default function PtAddOrder() {
+
+  const [user, setUser] = useState({});
   const [ptData, setPtData] = useState(null); // Initialize as null
   const [testmodalShown, setTestModalShown] = useState(false);
   const [tests, setTests] = useState([]);
@@ -14,94 +19,59 @@ export default function PtAddOrder() {
   const [remarks, setRemarks] = useState('');
   const [totalCost, setTotalCost] = useState(0);
   const [isLoading, setIsLoading] = useState(true); // Loading state
+  const [isDiscounted, setIsDiscounted] = useState(false);
 
 
-  const { pId } = useParams();
 
   useEffect(() => {
+    const token = Cookies.get('session'); // Retrieve the session cookie
+    if (token) {
+      const decoded = jwtDecode(token); // Decode the JWT token
+      setUser(decoded);
+    }
+  },[])
+
+
+  const { id } = useParams();
+
+  useEffect(() => {
+
+  
     const fetchData = async () => {
+      
+    // API Call PtData       
+    try{
+        await axios.get(`http://localhost:5000/patient/details/${id}`) // Use id instead of pId
+        .then((response) => {
+            if(response.data.errormessage) {
+                alert(response.data.errormessage);
+            } else {
+              if(response.data.idenno){
+                setIsDiscounted(true);
+              }
+                
+                setPtData(response.data);
+            }
+            // setIsLoading(false);
+        });
+    } catch (error) {
+        alert('Failed to fetch patient details. Please try again.');
+    }
+
+    try{
+        axios.get(`http://localhost:5000/test/all`) // Use id instead of pId
+        .then((response) => {
+            if(response.data) {
+              setTests(response.data);
+            }
+        });
+    } catch (error) {
+        alert('Failed to fetch tests. Please try again.');
+    }
+              
+     
       // Simulate fetching patient data
       setTimeout(() => {
-        setTests([
-          {
-            "id": 1,
-            "testCode": "CBC",
-            "testName": "Complete Blood Count",
-            "cost": 500,
-            "section": "Hematology"
-          },
-          {
-            "id": 2,
-            "testCode": "FBS",
-            "testName": "Fasting Blood Sugar",
-            "cost": 300,
-            "section": "Chemistry"
-          },
-          {
-            "id": 3,
-            "testCode": "LFT",
-            "testName": "Liver Function Test",
-            "cost": 700,
-            "section": "Chemistry"
-          },
-          {
-            "id": 4,
-            "testCode": "KFT",
-            "testName": "Kidney Function Test",
-            "cost": 800,
-            "section": "Chemistry"
-          },
-          {
-            "id": 5,
-            "testCode": "LIP",
-            "testName": "Lipid Profile",
-            "cost": 600,
-            "section": "Chemistry"
-          },
-          {
-            "id": 6,
-            "testCode": "TSH",
-            "testName": "Thyroid Stimulating Hormone",
-            "cost": 400,
-            "section": "Endocrinology"
-          },
-          {
-            "id": 7,
-            "testCode": "CRP",
-            "testName": "C-Reactive Protein",
-            "cost": 450,
-            "section": "Immunology"
-          },
-          {
-            "id": 8,
-            "testCode": "D-DIMER",
-            "testName": "D-Dimer Test",
-            "cost": 1000,
-            "section": "Coagulation"
-          },
-          {
-            "id": 9,
-            "testCode": "PT",
-            "testName": "Prothrombin Time",
-            "cost": 550,
-            "section": "Coagulation"
-          },
-          {
-            "id": 10,
-            "testCode": "ESR",
-            "testName": "Erythrocyte Sedimentation Rate",
-            "cost": 350,
-            "section": "Hematology"
-          }
-        ]);
-        setPtData({
-          branchid: 'PT12345',
-          lastname: 'Doe',
-          firstname: 'John',
-          middlename: 'A.',
-          gender: 'Male',
-          age: 30,
-        });
         
         setIsLoading(false); // Set loading to false after data is fetched
         
@@ -110,7 +80,7 @@ export default function PtAddOrder() {
     };
 
     fetchData();
-  }, [pId]);
+  }, [id]);
 
   const initialValues = {
     reqDr: '',
@@ -125,7 +95,7 @@ export default function PtAddOrder() {
   });
 
   const handleAddTest = (test) => {
-    if (!testsCart.some((t) => t.id === test.id)) {
+    if (!testsCart.some((t) => t._id === test._id)) {
       setTestsCart([...testsCart, test]);
       setTestModalShown(false); // Close the modal after adding the test
     }else{
@@ -136,21 +106,40 @@ export default function PtAddOrder() {
   // Autocompute total cost whenever testsCart changes
   useEffect(() => {
     const computeTotalCost = () => {
-      const total = testsCart.reduce((sum, test) => sum + test.cost, 0);
-      setTotalCost(total);
+      if(isDiscounted){
+        const total = testsCart.reduce((sum, test) => sum + test.discounted_price, 0);
+        setTotalCost(total);
+      }else{
+        const total = testsCart.reduce((sum, test) => sum + test.price, 0);
+        setTotalCost(total);
+      }
     };
-
     computeTotalCost();
   }, [testsCart]);
 
-  const onSubmit = (values) => {
+  const onSubmit = async (values) => {
     const formData = {
       ...values,
-      testsRequested: testsCart.map((test) => test.testName).join(', '),
+      testsRequested: testsCart,
+      // testsRequested: testsCart.map((test) => test.testName).join(', '),
       remarks: remarks,
     };
     console.log('Form Data:', formData);
     // Add your form submission logic here
+    try{
+      
+      await axios.post(`http://localhost:5000/order/add-order/${id}/${isDiscounted}/${user._id}`, formData)
+      .then((response) => {
+        if(response.data.errormessage) {
+          alert(response.data.errormessage);
+        } else {
+          alert('Order successfully submitted!');
+          window.location.reload(); // Refresh the page after submission
+        }
+      });
+    } catch (error) {
+      alert('Failed to submit order. Please try again.');
+    }
   };
 
   const handleTestModal = () => {
@@ -175,7 +164,7 @@ export default function PtAddOrder() {
           <div className="row">
             <div className="col-md-4">
               <label>Patient ID:</label>
-              <input type="text" className="form-control" value={ptData.branchid} disabled />
+              <input type="text" className="form-control" value={ptData.pid} disabled />
             </div>
             <div className="col-md-4">
               <label>Lastname:</label>
@@ -247,8 +236,8 @@ export default function PtAddOrder() {
               <tbody>
                 {testsCart.map((test, index) => (
                   <tr key={index}>
-                    <td>{test.testName}</td>
-                    <td>PHP {test.cost}</td>
+                    <td>{test.name}</td>
+                    <td>PHP {test.price}</td>
                     <td>
                       <button
                         type="button"

@@ -6,13 +6,9 @@ import Table from 'react-bootstrap/Table';
 function TestsModal({ modalShown, handleTestModal, tests, handleAddTest }) {
 
   const [filter, setFilter] = useState('');
-
-
-
-
   const filteredTests = tests.filter((test) =>
-    test.testName.toLowerCase().includes(filter.toLowerCase()) ||
-    test.testCode.toLowerCase().includes(filter.toLowerCase())
+    test.name.toLowerCase().includes(filter.toLowerCase()) ||
+    test.testcode.toLowerCase().includes(filter.toLowerCase())
   );
 
   return (
@@ -54,14 +50,19 @@ function TestsModal({ modalShown, handleTestModal, tests, handleAddTest }) {
             </thead>
             <tbody>
                 {Array.isArray(tests) && tests.length > 0 ? filteredTests.map((test) => (
-                <tr key={test.id}>
+                <tr key={test._id}>
+                  {test.show ? 
+                  <>
+                    <td>{test.testcode}</td>
+                    <td>{test.name}</td>
+                    <td>
+                      <Button variant="success" size='sm' onClick={() => handleAddTest(test)}>Select</Button>
+                    </td>
+                  </>  
+                  : null}
 
-                  <td>{test.testCode}</td>
-                  <td>{test.testName}</td>
-                  <td>
-                    <Button variant="success" size='sm' onClick={() => handleAddTest(test)}>Select</Button>
-                  </td>
                 </tr>
+                
               )) : null }
               
             </tbody>

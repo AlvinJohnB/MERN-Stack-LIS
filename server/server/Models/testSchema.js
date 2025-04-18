@@ -11,7 +11,7 @@ const testschema = new mongoose.Schema(
       unique: true,
     },
     section: {
-      type: Number,
+      type: String,
     },
     unit:{
       type: String,
@@ -27,6 +27,10 @@ const testschema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    isquali:{
+      type: Boolean,
+      default: false,
+    },
     show: {
       type: Boolean,
       default: false,
@@ -38,7 +42,7 @@ const testschema = new mongoose.Schema(
     reference_value_male: {
       type: String,
     },
-    reference_value_fenale:{
+    reference_value_female:{
       type: String,
     }
   },

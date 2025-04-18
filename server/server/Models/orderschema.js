@@ -22,8 +22,10 @@ const orderSchema = new mongoose.Schema(
       }
     ],
     requesting_physician: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Physician',
+      type: String,
+    },
+    patient_type: {
+      type: String,
     },
     total: {
       type: Number,
@@ -47,26 +49,14 @@ const orderSchema = new mongoose.Schema(
     progress:{
       type: Number
     },
-    isDiscouted:{
+    isDiscounted:{
       type: Boolean,
       default: false,
     },
-    queue_by: {
+    encoded_by: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-    },
-    closed_by: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-    },
-    order_notes:[
-      {
-        note: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'OrderNotes',
-        }
-      }
-    ]
+    }
   },
   {
     timestamps: true,

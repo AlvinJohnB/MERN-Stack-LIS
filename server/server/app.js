@@ -27,6 +27,9 @@ app.get('/', (req, res) => {
 
 app.use('/auth', Router.SigninRouter); 
 app.use('/patient', Router.PatientRouter);
+app.use('/test', Router.TestRouter);
+app.use('/order', Router.OrderRouter);
+
 app.use('/uploads', express.static(path.resolve('uploads')));
 
 export default app; 

@@ -4,70 +4,93 @@ import mongoose from 'mongoose';
 
 const OrderRouter = express.Router();
 
-// Add order to queue
-OrderRouter.post('/add-to-queue', async (req, res, next) => {
-  const { items, total } = req.body;
-
-  if (!items || items.length === 0) {
+// Add order
+OrderRouter.post('/add-order/:pid/:isDisc/:encoder/', async (req, res, next) => {
+  const { testsRequested, reqDr, remarks, ptType } = req.body;
+  const { pid, isDisc, encoder } = req.params;
+  
+  if (!testsRequested || testsRequested.length === 0) {
     return res.status(400).json({ message: 'No items in the order.' });
   }
 
   try {
     // Validate product IDs and check stock
-    const productIds = items.map((item) => item.productId);
-    const products = await Model.ProductModel.find({ _id: { $in: productIds } });
+    const testIds = testsRequested.map((item) => item._id);
+    const tests = await Model.TestModel.find({ _id: { $in: testIds } });
 
-    if (products.length !== items.length) {
+    if (tests.length !== testsRequested.length) {
       return res.status(400).json({ message: 'Some products are invalid or not found.' });
     }
-
-    // Check stock availability
-    for (const item of items) {
-      const product = products.find((p) => p._id.toString() === item.productId);
-      if (!product) {
-        return res.status(404).json({ message: `Product with ID ${item.productId} not found.` });
-      }
-      if (product.stock < item.quantity) {
-        return res.status(400).json({
-          message: `Insufficient stock for product ${product.name}. Available: ${product.stock}, Requested: ${item.quantity}`,
-        });
-      }
-    }
-
-    // // Deduct stock for each product
-    // for (const item of items) {
-    //   const product = products.find((p) => p._id.toString() === item.productId);
-    //   product.stock -= item.quantity;
-    //   await product.save();
-    // }
 
     // Generate a unique order ID starting from 0001
     const currentYear = new Date().getFullYear();
     const currentMonth = (new Date().getMonth() + 1).toString().padStart(2, '0');
     const prefix = `${currentYear}${currentMonth}`;
 
-    const lastOrder = await Model.OrderModel.findOne({ orderID: { $regex: `^${prefix}` } }).sort({ createdAt: -1 });
+    const lastOrder = await Model.OrderModel.findOne({ labnumber: { $regex: `^${prefix}` } }).sort({ createdAt: -1 });
     let orderID = `${prefix}0001`;
-    if (lastOrder && lastOrder.orderID) {
-      const lastOrderNumber = parseInt(lastOrder.orderID.slice(6), 10);
+    if (lastOrder && lastOrder.labnumber) {
+      const lastOrderNumber = parseInt(lastOrder.labnumber.slice(6), 10);
       orderID = `${prefix}${(lastOrderNumber + 1).toString().padStart(4, '0')}`;
     }
 
+    // Compute Total Per Section
+    const computeSectionTotals = (testsRequested, isDiscounted) => {
+      const sectionTotals = {
+        Chemistry: 0,
+        Hematology: 0,
+        Serology: 0,
+        CM: 0,
+      };
+    
+      testsRequested.forEach((test) => {
+        const price = isDiscounted ? test.discounted_price : test.price;
+    
+        if (sectionTotals.hasOwnProperty(test.section)) {
+          sectionTotals[test.section] += price;
+        }
+      });
+    
+      return sectionTotals;
+    };
+
+    const sectionTotals = computeSectionTotals(testsRequested, isDisc);
+
+
     // Create a new order
     const newOrder = new Model.OrderModel({
-      orderID: orderID,
-      products: items.map((item) => ({
-        product: item.productId,
-        quantity: item.quantity,
+      labnumber: orderID,
+      tests: testsRequested.map((item) => ({
+        test: item._id,
       })),
-      total,
-      status: 'pending', // Set the initial status of the order
+      patient: pid,
+      patient_type: ptType,
+      requesting_physician: reqDr,
+      isDiscounted: isDisc,
+      total: Object.values(sectionTotals).reduce((sum, value) => sum + value, 0), // Total cost
+      encoded_by: encoder,
+      status: 'PENDING',
+      cm_total: sectionTotals.CM,
+      sero_total: sectionTotals.Serology,
+      chemistry_total: sectionTotals.Chemistry,
+      hematology_total: sectionTotals.Hematology,
       createdAt: new Date(),
     });
 
     const savedOrder = await newOrder.save();
+    
+    // Save order notes
+    if (remarks) {
+      const newOrderNote = new Model.OrderNoteModel({
+        order: savedOrder._id,
+        note: remarks,
+        createdBy: encoder, // Assuming encoder is the user ID
+      });
 
-    res.status(201).json({ message: 'Order added to queue successfully.', order: savedOrder });
+      await newOrderNote.save();
+    }
+
+    res.status(201).json({ message: 'Order added successfully.', order: savedOrder });
   } catch (error) {
     console.error('Error adding order to queue:', error);
     next(error);
