@@ -9,6 +9,8 @@ import PtSreach from './pages/reception/PtSreach';
 import PtReg from './pages/reception/PtReg';
 import PtAddOrder from './pages/reception/PtAddOrder';
 import Orders from './pages/reception/Orders';
+import NotFound from './pages/NotFound';
+import Signup from './pages/Signup';
 
 
 function App() {
@@ -19,6 +21,7 @@ function App() {
         <Routes>
 
           <Route path="/signin" element={<Signin />} />
+          <Route path="/signup" element={<Signup />} />
 
           <Route path='/' element={
               <ProtectedRoute>
@@ -47,7 +50,7 @@ function App() {
 
 
         
-        
+          <Route path="*" element={<NotFound />} />
         {/* Public Route for Signin */}
         </Routes>
        

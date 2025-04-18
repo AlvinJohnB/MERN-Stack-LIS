@@ -1,11 +1,7 @@
 import SigninRouter from './userRoute.js';
-import articleRouter from './article.js';
-import productRouter from './productRoute.js';
-import OrderRouter from './orderRoute.js';
+import PatientRouter from './patientRoute.js';
 
 export default {
   SigninRouter,
-  articleRouter,
-  productRouter,
-  OrderRouter,
+  PatientRouter,
 };

@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import axios from 'axios';
 
 export default function PtReg() {
   const [ptId] = useState(``); // Example patient ID
-  const [patientAge, setPatientAge] = useState('');
+  const [patientAge, setPatientAge] = useState(0);
 
   const initialValues = {
     lastname: '',
     firstname: '',
     middlename: '',
     bday: '',
-    age: '',
+    age: patientAge,
     gender: '',
     address: '',
     phone: '',
@@ -29,8 +30,22 @@ export default function PtReg() {
     idenno: Yup.string(),
   });
 
-  const onSubmit = (values) => {
-    console.log('Form Data:', values);
+  const onSubmit = async (values) => {
+    // Set the age in the values object before sending it to the server
+    values.age = patientAge;
+
+    try {
+      const response = await axios.post('http://localhost:5000/patient/create', values, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if(response.data.errormessage) {
+        alert(response.data.errormessage);
+      }
+    } catch (error) {
+      alert('Failed to register patient. Please try again.');
+    }
     // Add your form submission logic here
   };
 
@@ -45,6 +60,10 @@ export default function PtReg() {
       setPatientAge(age);
     }
   };
+
+  useEffect(() => {
+    getAge({ target: { value: initialValues.bday } });
+  }, [initialValues.bday])
 
   return (
     <div className="container-fluid mt-4">

@@ -1,9 +1,8 @@
 import bcryptjs from 'bcryptjs';
-import awsHandler from './aws.js';
 import Model from '../Models/Model.js';
 
 const userSignUp = (req, res, next) => {
-  const { name, password, email, username, imageUrl } = req.body;
+  const { name, password, username, position, licenseNo } = req.body;
 
   // Check if the email is already taken
   Model.UserModel.findOne({ username })
@@ -13,52 +12,36 @@ const userSignUp = (req, res, next) => {
       }
 
       // Proceed with user creation
-      const handleUserCreation = (image) => {
-        bcryptjs.hash(password, 12).then((hashedPassword) => {
-          const newUser = new Model.UserModel({
-            name,
-            password: hashedPassword,
-            email,
-            imageUrl: image || imageUrl, // Use either the uploaded image or the provided URL
-            username, // Ensure the username is unique
-            userType: 'user',
-          });
-
-          newUser
-            .save()
-            .then((savedUser) =>
-              res.status(200).json({
-                message: 'Account created successfully.',
-                savedUser,
-              })
-            )
-            .catch((err) => {
-              res.status(500);
-              next(
-                new Error(`Unable to create user. Please try later. ${err}`)
-              );
-            });
+    bcryptjs.hash(password, 12)
+      .then((hashedPassword) => {
+        const newUser = new Model.UserModel({
+          name,
+          password: hashedPassword,
+          username,
+          userType: 'user',
+          position,
+          licenseNo
         });
-      };
 
-      // Handle file upload if present, otherwise proceed with the provided imageUrl
-      if (req.file) {
-        awsHandler
-          .UploadToAws(req.file)
-          .then((uploadedImage) => {
-            handleUserCreation(uploadedImage);
-          })
+        newUser
+          .save()
+          .then((savedUser) =>
+            res.status(200).json({
+              message: 'Account created successfully.',
+              savedUser,
+            })
+          )
           .catch((err) => {
             res.status(500);
-            next(new Error(`Image upload failed. ${err}`));
+            next(
+              new Error(`Unable to create user. Please try later. ${err}`)
+            );
           });
-      } else {
-        handleUserCreation(imageUrl || ''); // Pass imageUrl or an empty string if neither is provided
-      }
-    })
-    .catch((err) => {
-      res.status(500);
-      next(new Error(err));
+      })
+      .catch((err) => {
+        res.status(500);
+        next(new Error(err));
+      });
     });
 };
 

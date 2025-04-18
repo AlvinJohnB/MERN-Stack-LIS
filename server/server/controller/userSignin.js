@@ -4,14 +4,14 @@ import jwt from 'jsonwebtoken';
 import Model from '../Models/Model.js';
 
 const createToken = (user, res, next) => {
-  const { id, email, name, username, userType, imageUrl } = user;
+  const { id, name, username, userType, position, licenseNo } = user;
   const payload = {
     _id: id,
-    email,
     name,
     username,
     userType,
-    imageUrl,
+    position,
+    licenseNo
   };
   console.log(payload);
   // create a token
@@ -19,7 +19,7 @@ const createToken = (user, res, next) => {
     payload,
     process.env.JWT_SECRET,
     {
-      expiresIn: '3d',
+      expiresIn: '1d',
     },
     (err, token) => {
       // Error Create the Token

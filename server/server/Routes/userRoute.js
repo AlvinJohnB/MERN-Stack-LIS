@@ -11,6 +11,6 @@ const upload = multer({
 });
 
 AuthRouter.post('/', userSignIn);
-AuthRouter.post('/signUp', upload.single('imageUrl'), userSignUp);
+AuthRouter.post('/signup', userSignUp);
 
 export default AuthRouter;

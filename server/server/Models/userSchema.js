@@ -9,9 +9,6 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
     },
-    email: {
-      type: String,
-    },
     userType: {
       type: String,
       default: 'user',
@@ -23,9 +20,8 @@ const userSchema = new mongoose.Schema(
     position:{
       type: String
     },
-    imageUrl: {
-      type: String,
-      default: '',
+    licenseNo:{
+      type: String
     },
   },
   {

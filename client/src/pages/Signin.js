@@ -1,16 +1,28 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { AuthContext } from '../contexts/AuthContext'; // Import AuthContext
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
 
 const Signin = () => {
-  const { login } = useContext(AuthContext); // Access login function from AuthContext
-  const [email, setEmail] = useState('');
+  const navigate = useNavigate(); // Initialize useNavigate hook
+  const { login, isAuthenticated } = useContext(AuthContext); // Access login function from AuthContext
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSubmit = (e) => {
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/'); // Redirect to dashboard if already authenticated
+    }
+  }, [isAuthenticated, navigate]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // Perform login logic here (e.g., API call)
-    login(); // Call login function from AuthContext
-    console.log('Logged in with:', { email, password });
+    await login({ username, password }); // Await login function from AuthContext
+    if (isAuthenticated) {
+      // Redirect to dashboard or another page after successful login
+      navigate('/'); // Redirect to dashboard
+    }
   };
 
   return (
@@ -20,15 +32,15 @@ const Signin = () => {
           <h3 className="card-title text-center mb-4">Sign In</h3>
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label htmlFor="email" className="form-label">
-                Email address
+              <label htmlFor="username" className="form-label">
+                Username
               </label>
               <input
-                type="email"
+                type="text"
                 className="form-control"
-                id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                id="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 required
               />
             </div>

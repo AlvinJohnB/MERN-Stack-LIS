@@ -18,7 +18,7 @@ const patientSchema = new mongoose.Schema(
       type: String,
     },
     gender: {
-      type: Number,
+      type: String,
       required: true,
     },
     bday: {
@@ -39,6 +39,12 @@ const patientSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    orders: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Order',
+      },
+    ],
     diagnosis: [
         {
             type: mongoose.Schema.Types.ObjectId,
