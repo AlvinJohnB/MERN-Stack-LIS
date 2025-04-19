@@ -48,7 +48,7 @@ export default function PatientDetails() {
     gender: ptData.gender,
     address: ptData.address,
     phone: ptData.phone,
-    idenno: ptData.idenno,
+    idenno: ptData.idenno || '', // Use the fetched data or empty string
   };
 
   const validationSchema = Yup.object().shape({

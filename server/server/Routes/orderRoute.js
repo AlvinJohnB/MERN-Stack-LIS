@@ -56,6 +56,46 @@ OrderRouter.post('/add-order/:pid/:isDisc/:encoder/', async (req, res, next) => 
 
     const sectionTotals = computeSectionTotals(testsRequested, isDisc);
 
+    // Group tests by section
+    const groupTestsBySection = async (testsRequested) => {
+      const sections = {};
+
+      for (const test of testsRequested) {
+
+        if (test.package) {
+          // find in packages schema
+          const profile = await Model.PackageModel.findOne({ name: test.testcode }).populate('tests');
+ 
+          if (profile && profile.tests.length > 0) {
+            profile.tests.forEach((test) => {
+              if (!sections[test.section]) {
+                sections[test.section] = [];
+              }
+              sections[test.section].push({
+                test: test._id,
+              });
+            });
+          }
+        }
+
+        if (!sections[test.section]) {
+          sections[test.section] = [];
+        }
+        // check if test is a package
+        sections[test.section].push({
+          test: test._id,
+        });
+      }
+      
+      return sections;
+    };
+
+    const groupedSections = await groupTestsBySection(testsRequested);
+    
+    console.log('Grouped Sections:', groupedSections);
+    
+    
+
 
     // Create a new order
     const newOrder = new Model.OrderModel({
@@ -76,8 +116,21 @@ OrderRouter.post('/add-order/:pid/:isDisc/:encoder/', async (req, res, next) => 
       hematology_total: sectionTotals.Hematology,
       createdAt: new Date(),
     });
+    
 
     const savedOrder = await newOrder.save();
+
+    // Create Section Orders
+    for (const [section, tests] of Object.entries(groupedSections)) {
+      const newSectionOrder = new Model.SectionOrderModel({
+        labnumber: savedOrder._id,
+        patient: pid,
+        section,
+        tests: tests,
+      });
+
+      await newSectionOrder.save();
+    }
     
     // Save order notes
     if (remarks) {
@@ -91,248 +144,29 @@ OrderRouter.post('/add-order/:pid/:isDisc/:encoder/', async (req, res, next) => 
     }
 
     res.status(201).json({ message: 'Order added successfully.', order: savedOrder });
+
   } catch (error) {
     console.error('Error adding order to queue:', error);
     next(error);
   }
 });
 
-// Fetch orders in the queue
-OrderRouter.get('/queue', async (req, res, next) => {
+// Route to fetch all orders
+OrderRouter.get('/all-orders', async (req, res) => {
   try {
-    const orders = await Model.OrderModel.find({ status: 'pending' })
-      .sort({ createdAt: 1 })
-      .populate({
-        path: 'products.product',
-        select: 'name sku price retail_price', // Select only the specified fields
-      });
+    // Fetch all orders and optionally populate related fields
+    const orders = await Model.OrderModel.find()
+      .populate('tests.test') // Populate test details
+      .populate('patient', 'firstname lastname middlename pid') // Populate patient details
+      .sort({ createdAt: -1 }); // Sort by creation date (most recent first)
 
-    res.status(200).json({ message: 'Orders in queue fetched successfully.', orders });
+    res.json({ message: 'Orders fetched successfully.', orders });
   } catch (error) {
-    console.error('Error fetching orders in queue:', error);
-    next(error);
+    console.error('Error fetching orders:', error);
+    res.json({ error: 'Error fetching orders.' });
   }
 });
 
-// Fetch order by ID
-OrderRouter.get('/:id', async (req, res, next) => {
-  const { id } = req.params;
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({ message: 'Invalid order ID.' });
-  }
-
-  try {
-    const order = await Model.OrderModel.findById(id).populate({
-      path: 'products.product',
-      select: 'name sku price retail_price', // Select only the specified fields
-    });
-
-    if (!order) {
-      return res.status(404).json({ message: 'Order not found.' });
-    }
-
-    res.status(200).json({ message: 'Order fetched successfully.', order });
-  } catch (error) {
-    console.error('Error fetching order by ID:', error);
-    next(error);
-  }
-});
-
-// Add order with completed status
-OrderRouter.post('/add-completed-order', async (req, res, next) => {
-  const { items, total, change, cash_tendered, mode_of_payment } = req.body;
-
-  if (!items || items.length === 0) {
-    return res.status(400).json({ message: 'No items in the order.' });
-  }
-
-  try {
-    // Validate product IDs
-    const productIds = items.map((item) => item.productId);
-    const products = await Model.ProductModel.find({ _id: { $in: productIds } });
-
-    if (products.length !== items.length) {
-      return res.status(400).json({ message: 'Some products are invalid or not found.' });
-    }
-
-    // Generate a unique order ID starting from 0001
-    const currentYear = new Date().getFullYear();
-    const currentMonth = (new Date().getMonth() + 1).toString().padStart(2, '0');
-    const prefix = `${currentYear}${currentMonth}`;
-
-    const lastOrder = await Model.OrderModel.findOne({ orderID: { $regex: `^${prefix}` } }).sort({ createdAt: -1 });
-    let orderID = `${prefix}0001`;
-    if (lastOrder && lastOrder.orderID) {
-      const lastOrderNumber = parseInt(lastOrder.orderID.slice(6), 10);
-      orderID = `${prefix}${(lastOrderNumber + 1).toString().padStart(4, '0')}`;
-    }
-
-    // Update stock for each product
-    for (const item of items) {
-      const product = products.find((p) => p._id.toString() === item.productId);
-      if (product) {
-        product.stock -= item.quantity;
-        await product.save();
-      }
-    }
-
-    // Create a new order with completed status
-    const newOrder = new Model.OrderModel({
-      orderID: orderID,
-      products: items.map((item) => ({
-        product: item.productId,
-        quantity: item.quantity,
-      })),
-      total,
-      change,
-      cash_tendered,
-      mode_of_payment,
-      status: 'completed', // Set the status to completed
-    });
-
-    const savedOrder = await newOrder.save();
-
-    res.status(201).json({ message: 'Completed order added successfully.', order: savedOrder });
-  } catch (error) {
-    console.error('Error adding completed order:', error);
-    next(error);
-  }
-});
-
-// Update order with completed status
-OrderRouter.put('/update-to-completed/:id', async (req, res, next) => {
-  const { id } = req.params;
-  const { change, cash_tendered, mode_of_payment, items } = req.body;
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({ message: 'Invalid order ID.' });
-  }
-
-  try {
-    const order = await Model.OrderModel.findById(id);
-
-    if (!order) {
-      // If order not found, use add-completed-order logic
-      const { items, total, change, cash_tendered, mode_of_payment } = req.body;
-
-      if (!items || items.length === 0) {
-        return res.status(400).json({ message: 'No items in the order.' });
-      }
-
-      // Validate product IDs
-      const productIds = items.map((item) => item.productId);
-      const products = await Model.ProductModel.find({ _id: { $in: productIds } });
-
-      if (products.length !== items.length) {
-        return res.status(400).json({ message: 'Some products are invalid or not found.' });
-      }
-
-      // Generate a unique order ID starting from 0001
-      const currentYear = new Date().getFullYear();
-      const currentMonth = (new Date().getMonth() + 1).toString().padStart(2, '0');
-      const prefix = `${currentYear}${currentMonth}`;
-
-      const lastOrder = await Model.OrderModel.findOne({ orderID: { $regex: `^${prefix}` } }).sort({ createdAt: -1 });
-      let orderID = `${prefix}0001`;
-      if (lastOrder && lastOrder.orderID) {
-        const lastOrderNumber = parseInt(lastOrder.orderID.slice(6), 10);
-        orderID = `${prefix}${(lastOrderNumber + 1).toString().padStart(4, '0')}`;
-      }
-
-      // Update stock for each product
-      for (const item of items) {
-        const product = products.find((p) => p._id.toString() === item.productId);
-        if (product) {
-          product.stock -= item.quantity;
-          await product.save();
-        }
-      }
-
-      // Create a new order with completed status
-      const newOrder = new Model.OrderModel({
-        orderID: orderID,
-        products: items.map((item) => ({
-          product: item.productId,
-          quantity: item.quantity,
-        })),
-        total,
-        change,
-        cash_tendered,
-        mode_of_payment,
-        status: 'completed', // Set the status to completed
-      });
-
-      const savedOrder = await newOrder.save();
-
-      return res.status(201).json({ message: 'Completed order added successfully.', order: savedOrder });
-    }
-
-    if (order.status === 'completed') {
-      return res.status(400).json({ message: 'Order is already completed.' });
-    }
-
-    if (items && items.length > 0) {
-      // Validate product IDs
-      const productIds = items.map((item) => item.productId);
-      const products = await Model.ProductModel.find({ _id: { $in: productIds } });
-
-      if (products.length !== items.length) {
-        return res.status(400).json({ message: 'Some products are invalid or not found.' });
-      }
-
-      // Check stock availability and update stock
-      for (const item of items) {
-        const product = products.find((p) => p._id.toString() === item.productId);
-        if (!product) {
-          return res.status(404).json({ message: `Product with ID ${item.productId} not found.` });
-        }
-        if (product.stock < item.quantity) {
-          return res.status(400).json({
-            message: `Insufficient stock for product ${product.name}. Available: ${product.stock}, Requested: ${item.quantity}`,
-          });
-        }
-      }
-
-      // // Restore stock for previous items
-      // for (const prevItem of order.products) {
-      //   const product = await Model.ProductModel.findById(prevItem.product);
-      //   if (product) {
-      //     product.stock += prevItem.quantity;
-      //     await product.save();
-      //   }
-      // }
-
-      // Deduct stock for new items
-      for (const item of items) {
-        const product = products.find((p) => p._id.toString() === item.productId);
-        if (product) {
-          product.stock -= item.quantity;
-          await product.save();
-        }
-      }
-
-      // Update order items
-      order.products = items.map((item) => ({
-        product: item.productId,
-        quantity: item.quantity,
-      }));
-    }
-
-    // Update the order status and payment details
-    order.status = 'completed';
-    order.change = change;
-    order.cash_tendered = cash_tendered;
-    order.mode_of_payment = mode_of_payment;
-
-    const updatedOrder = await order.save();
-
-    res.status(200).json({ message: 'Order updated to completed successfully.', order: updatedOrder });
-  } catch (error) {
-    console.error('Error updating order to completed:', error);
-    next(error);
-  }
-});
 
 
 

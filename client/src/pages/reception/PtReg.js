@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 export default function PtReg() {
+  const navigate = useNavigate();
   const [ptId] = useState(``); // Example patient ID
   const [patientAge, setPatientAge] = useState(0);
 
@@ -42,6 +44,8 @@ export default function PtReg() {
       });
       if(response.data.errormessage) {
         alert(response.data.errormessage);
+      } else {
+        navigate(`/pt-add-order/${ptId}`);
       }
     } catch (error) {
       alert('Failed to register patient. Please try again.');

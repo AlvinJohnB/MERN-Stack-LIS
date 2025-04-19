@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useParams } from 'react-router-dom';
@@ -7,9 +7,12 @@ import Spinner from 'react-bootstrap/Spinner';
 import axios from 'axios';
 import Cookies from 'js-cookie'; // Import js-cookie
 import { jwtDecode } from 'jwt-decode';
+import { useNavigate } from 'react-router-dom';
 
 
 export default function PtAddOrder() {
+
+  const navigate = useNavigate();
 
   const [user, setUser] = useState({});
   const [ptData, setPtData] = useState(null); // Initialize as null
@@ -118,6 +121,9 @@ export default function PtAddOrder() {
   }, [testsCart]);
 
   const onSubmit = async (values) => {
+
+    setIsLoading(true); // Set loading to true when submitting the form
+
     const formData = {
       ...values,
       testsRequested: testsCart,
@@ -133,13 +139,22 @@ export default function PtAddOrder() {
         if(response.data.errormessage) {
           alert(response.data.errormessage);
         } else {
-          alert('Order successfully submitted!');
-          window.location.reload(); // Refresh the page after submission
+
+          setTimeout(() => {
+        
+            setIsLoading(false); // Set loading to false after data is fetched
+            navigate(`/orders`); // Redirect to the order page after submission
+
+          }, 2000); // Simulate a 2-second delay
+         
         }
       });
     } catch (error) {
       alert('Failed to submit order. Please try again.');
     }
+    
+      
+   
   };
 
   const handleTestModal = () => {

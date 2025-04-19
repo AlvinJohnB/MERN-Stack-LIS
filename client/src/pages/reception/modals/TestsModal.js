@@ -49,9 +49,9 @@ function TestsModal({ modalShown, handleTestModal, tests, handleAddTest }) {
               </tr>
             </thead>
             <tbody>
-                {Array.isArray(tests) && tests.length > 0 ? filteredTests.map((test) => (
+                {Array.isArray(tests) && tests.length > 0 && filteredTests.map((test) => (
                 <tr key={test._id}>
-                  {test.show ? 
+                  {test.show && 
                   <>
                     <td>{test.testcode}</td>
                     <td>{test.name}</td>
@@ -59,11 +59,10 @@ function TestsModal({ modalShown, handleTestModal, tests, handleAddTest }) {
                       <Button variant="success" size='sm' onClick={() => handleAddTest(test)}>Select</Button>
                     </td>
                   </>  
-                  : null}
-
+                  }
                 </tr>
                 
-              )) : null }
+              ))}
               
             </tbody>
           </Table>

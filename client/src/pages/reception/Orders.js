@@ -8,155 +8,38 @@ import Button from 'react-bootstrap/Button';
 import axios from 'axios';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import OrderDetailsModal from './modals/OrderDetailsModal';
+import moment from 'moment';
+
 
 export default function Orders() {
 
-  const [isLoading, setIsLoading] = useState(false); // Loading state
-  const [orders, setOrders] = useState([
-    {
-      "labNumber": "LAB001",
-      "patientName": "John Doe",
-      "testsRequested": "Complete Blood Count, Lipid Profile",
-      "progress": "In Progress",
-      "dateEncoded": "2023-10-01"
-    },
-    {
-      "labNumber": "LAB002",
-      "patientName": "Jane Smith",
-      "testsRequested": "Fasting Blood Sugar, Liver Function Test",
-      "progress": "Completed",
-      "dateEncoded": "2023-10-02"
-    },
-    {
-      "labNumber": "LAB003",
-      "patientName": "Alice Johnson",
-      "testsRequested": "Kidney Function Test",
-      "progress": "Pending",
-      "dateEncoded": "2023-10-03"
-    },
-    {
-      "labNumber": "LAB004",
-      "patientName": "Bob Brown",
-      "testsRequested": "Thyroid Stimulating Hormone",
-      "progress": "In Progress",
-      "dateEncoded": "2023-10-04"
-    },
-    {
-      "labNumber": "LAB005",
-      "patientName": "Charlie Davis",
-      "testsRequested": "C-Reactive Protein, Prothrombin Time",
-      "progress": "Completed",
-      "dateEncoded": "2023-10-05"
-    },
-    {
-      "labNumber": "LAB006",
-      "patientName": "Emily White",
-      "testsRequested": "Erythrocyte Sedimentation Rate",
-      "progress": "Pending",
-      "dateEncoded": "2023-10-06"
-    },
-    {
-      "labNumber": "LAB007",
-      "patientName": "Frank Green",
-      "testsRequested": "Liver Function Test",
-      "progress": "In Progress",
-      "dateEncoded": "2023-10-07"
-    },
-    {
-      "labNumber": "LAB008",
-      "patientName": "Grace Black",
-      "testsRequested": "Kidney Function Test, Lipid Profile",
-      "progress": "Completed",
-      "dateEncoded": "2023-10-08"
-    },
-    {
-      "labNumber": "LAB009",
-      "patientName": "Henry Blue",
-      "testsRequested": "Complete Blood Count",
-      "progress": "Pending",
-      "dateEncoded": "2023-10-09"
-    },
-    {
-      "labNumber": "LAB010",
-      "patientName": "Ivy Brown",
-      "testsRequested": "Thyroid Stimulating Hormone",
-      "progress": "In Progress",
-      "dateEncoded": "2023-10-10"
-    },
-    {
-      "labNumber": "LAB011",
-      "patientName": "Jack Yellow",
-      "testsRequested": "Fasting Blood Sugar",
-      "progress": "Completed",
-      "dateEncoded": "2023-10-11"
-    },
-    {
-      "labNumber": "LAB012",
-      "patientName": "Karen Gray",
-      "testsRequested": "C-Reactive Protein",
-      "progress": "Pending",
-      "dateEncoded": "2023-10-12"
-    },
-    {
-      "labNumber": "LAB013",
-      "patientName": "Leo White",
-      "testsRequested": "Prothrombin Time",
-      "progress": "In Progress",
-      "dateEncoded": "2023-10-13"
-    },
-    {
-      "labNumber": "LAB014",
-      "patientName": "Mia Red",
-      "testsRequested": "Erythrocyte Sedimentation Rate",
-      "progress": "Completed",
-      "dateEncoded": "2023-10-14"
-    },
-    {
-      "labNumber": "LAB015",
-      "patientName": "Noah Purple",
-      "testsRequested": "Liver Function Test",
-      "progress": "Pending",
-      "dateEncoded": "2023-10-15"
-    },
-    {
-      "labNumber": "LAB016",
-      "patientName": "Olivia Orange",
-      "testsRequested": "Kidney Function Test",
-      "progress": "In Progress",
-      "dateEncoded": "2023-10-16"
-    },
-    {
-      "labNumber": "LAB017",
-      "patientName": "Paul Cyan",
-      "testsRequested": "Complete Blood Count",
-      "progress": "Completed",
-      "dateEncoded": "2023-10-17"
-    },
-    {
-      "labNumber": "LAB018",
-      "patientName": "Quinn Magenta",
-      "testsRequested": "Thyroid Stimulating Hormone",
-      "progress": "Pending",
-      "dateEncoded": "2023-10-18"
-    },
-    {
-      "labNumber": "LAB019",
-      "patientName": "Ruby Pink",
-      "testsRequested": "Fasting Blood Sugar",
-      "progress": "In Progress",
-      "dateEncoded": "2023-10-19"
-    },
-    {
-      "labNumber": "LAB020",
-      "patientName": "Sam Gold",
-      "testsRequested": "C-Reactive Protein, Prothrombin Time",
-      "progress": "Completed",
-      "dateEncoded": "2023-10-20"
-    }
-  ]); // Orders data
-  
+  const [isLoading, setIsLoading] = useState(true); // Loading state
+  const [orders, setOrders] = useState([]);
   const [detailModalShown, setDetailModalShown] = useState(false)
   const [orderDetails, setOrderDetails] = useState({})
+
+
+  const fetchOrders = async () => {
+    try{
+      await axios.get('http://localhost:5000/order/all-orders')
+        .then((response) => {
+          setOrders(response.data.orders)
+        })
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+    }
+  }
+
+  useEffect(() => {
+
+    fetchOrders();
+
+    setTimeout(() => {
+      setIsLoading(false);
+      console.log(orders)
+    }, 500); // Simulate a delay for loading state
+
+  }, [orders])
 
   const handleDetailModal = () => {
     setDetailModalShown(!detailModalShown);
@@ -189,40 +72,25 @@ export default function Orders() {
     setOrderDetails(order)
   }
 
-  const displayOrders = orders
+  const displayOrders = orders.length > 0 ? orders
     .slice(pagesVisited, pagesVisited + ordersPerPage)
     .map((order, index) => (
       <tr key={index}>
-        <td className="">{order.labNumber}</td>
-        <td className="">{order.patientName}</td>
-        <td className="">{order.testsRequested}</td>
-        <td className="text-center"><ProgressBar animated striped variant="success" now={40} /></td>
-        <td className="text-center">{order.dateEncoded}</td>
+        <td className="">{order.labnumber}</td>
+        <td className="">{`${order.patient.lastname}, ${order.patient.firstname}, ${order.patient.middlename}`}</td>
+        <td className="">{order.tests.map(t => t.test.testcode).join(', ')}</td>
+        <td className="text-center">{order.status === "PENDING" ? <ProgressBar animated striped variant="primary" now={40} /> : <ProgressBar striped variant="success" now={100} />}</td>
+        <td className="text-center">{moment(order.createdAt).format('MMMM DD, YYYY')}</td>
         <td className="text-center">
           <Button onClick={() => { handleDetail(order); }} variant="success" size="sm">
             View
           </Button>
         </td>
       </tr>
-    ));
+    )): null;
 
     
 
-//   useEffect(() => {
-//     const fetchOrders = async () => {
-//       setIsLoading(true);
-//       try {
-//         const response = await axios.get('http://localhost:5000/orders'); // Replace with your API endpoint
-//         setOrders(response.data);
-//       } catch (error) {
-//         console.error('Error fetching orders:', error);
-//       } finally {
-//         setIsLoading(false);
-//       }
-//     };
-
-//     fetchOrders();
-//   }, []);
 
   const onSubmit = async (data) => {
     setIsLoading(true);
@@ -276,15 +144,15 @@ export default function Orders() {
       <Table size='sm' hover responsive>
         <thead className="table-secondary">
           <tr>
-            <th className="text-center">Lab Number</th>
-            <th className="text-center">Patient Name</th>
-            <th className="text-center">Test/s Requested</th>
+            <th className="">Lab Number</th>
+            <th className="">Patient Name</th>
+            <th className="">Test/s Requested</th>
             <th className="mob text-center">Progress</th>
             <th className="mob text-center">Date Encoded</th>
             <th className="text-center">Action</th>
           </tr>
         </thead>
-        <tbody>{displayOrders}</tbody>
+        <tbody>{orders.length > 0 && displayOrders}</tbody>
       </Table>
       <br />
       {pageCount > 1 && (
@@ -309,7 +177,7 @@ export default function Orders() {
         />
       )}
 
-      <OrderDetailsModal orderDetails={orderDetails} detailModalShown={detailModalShown} handleDetailModal={handleDetailModal} />
+      {/* {orders && <OrderDetailsModal orderDetails={orderDetails} detailModalShown={detailModalShown} handleDetailModal={handleDetailModal} />} */}
     </div>
   );
 }
