@@ -1,3 +1,4 @@
+import { useParams } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import ReactPaginate from 'react-paginate';
 import { Formik, Form, Field } from 'formik';
@@ -6,25 +7,27 @@ import Spinner from 'react-bootstrap/Spinner';
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 import axios from 'axios';
-import ProgressBar from 'react-bootstrap/ProgressBar';
-import OrderDetailsModal from './modals/OrderDetailsModal';
 import moment from 'moment';
+import { useNavigate } from 'react-router-dom';
 
 
-export default function Orders() {
 
+export default function SectionTab() {
+
+  const { section } = useParams();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true); // Loading state
   const [orders, setOrders] = useState([]);
   const [detailModalShown, setDetailModalShown] = useState(false)
-  const [orderDetails, setOrderDetails] = useState({})
+
 
 
   const fetchOrders = async () => {
+    setIsLoading(true);
     try{
-      await axios.get('http://localhost:5000/order/all-orders')
+      await axios.get(`http://localhost:5000/order/section-orders/${section}`)
         .then((response) => {
           setOrders(response.data.orders)
-          setOrderDetails(response.data.orders[0])
         })
     } catch (error) {
       console.error('Error fetching orders:', error);
@@ -37,10 +40,9 @@ export default function Orders() {
     
     setTimeout(() => {
       setIsLoading(false);
-      console.log(orders)
     }, 500); // Simulate a delay for loading state
 
-  }, [])
+  }, [section])
 
   const handleDetailModal = () => {
     setDetailModalShown(!detailModalShown);
@@ -68,22 +70,21 @@ export default function Orders() {
     setPageNumber(selected);
   };
 
-  const handleDetail = (order) => {
-    setDetailModalShown(true)
-    setOrderDetails(order)
+  const handleDetail = (order, section) => {
+    console.log(order._id, section);
+    navigate(`/lab/${section}/${order._id}`)
   }
 
   const displayOrders = orders.length > 0 ? orders
     .slice(pagesVisited, pagesVisited + ordersPerPage)
     .map((order, index) => (
       <tr key={index}>
-        <td className="">{order.labnumber}</td>
+        <td className="">{order.labnumber.labnumber}</td>
         <td className="">{`${order.patient.lastname}, ${order.patient.firstname}, ${order.patient.middlename}`}</td>
-        <td className="">{order.tests.map(t => t.test.testcode).join(', ')}</td>
-        <td className="text-center">{order.status === "PENDING" ? <ProgressBar animated striped variant="primary" now={40} /> : <ProgressBar striped variant="success" now={100} />}</td>
+        <td className="">{order.labnumber.tests.filter(t => t.test.section === section).map(t => t.test.testcode).join(', ')}</td>
         <td className="text-center">{moment(order.createdAt).format('MMMM DD, YYYY')}</td>
         <td className="text-center">
-          <Button onClick={() => { handleDetail(order); }} variant="success" size="sm">
+          <Button onClick={() => { handleDetail(order, section); }} variant="primary" size="sm">
             View
           </Button>
         </td>
@@ -109,10 +110,11 @@ export default function Orders() {
     }
   };
 
+
   if (isLoading) {
     return (
       <div className="text-center mt-5">
-        <Spinner animation="border" variant="success" size="lg" />
+        <Spinner animation="border" variant="primary" size="lg" />
         <h5>Loading...</h5>
       </div>
     );
@@ -120,7 +122,7 @@ export default function Orders() {
 
   return (
     <div className="container-fluid my-3">
-      <h3>Orders</h3>
+      <h3>{section}</h3>
       <div className="row">
         <div className="col-md-3 mb-5">
           <Formik initialValues={initialValues} onSubmit={onSubmit} validationSchema={validationSchema}>
@@ -134,7 +136,7 @@ export default function Orders() {
                   placeholder="Enter lab no..."
                   className="form-control col-md-3"
                 />
-                <Button variant="success" className="my-auto mx-1" type="submit">
+                <Button variant="primary" className="my-auto mx-1" type="submit">
                   Search
                 </Button>
               </div>
@@ -148,7 +150,6 @@ export default function Orders() {
             <th className="">Lab Number</th>
             <th className="">Patient Name</th>
             <th className="">Test/s Requested</th>
-            <th className="mob text-center">Progress</th>
             <th className="mob text-center">Date Encoded</th>
             <th className="text-center">Action</th>
           </tr>
@@ -178,7 +179,6 @@ export default function Orders() {
         />
       )}
 
-      {orders.length > 0 && <OrderDetailsModal orderDetails={orderDetails} detailModalShown={detailModalShown} handleDetailModal={handleDetailModal} />}
     </div>
   );
 }

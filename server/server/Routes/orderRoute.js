@@ -8,6 +8,8 @@ const OrderRouter = express.Router();
 OrderRouter.post('/add-order/:pid/:isDisc/:encoder/', async (req, res, next) => {
   const { testsRequested, reqDr, remarks, ptType } = req.body;
   const { pid, isDisc, encoder } = req.params;
+
+
   
   if (!testsRequested || testsRequested.length === 0) {
     return res.status(400).json({ message: 'No items in the order.' });
@@ -42,10 +44,9 @@ OrderRouter.post('/add-order/:pid/:isDisc/:encoder/', async (req, res, next) => 
         Serology: 0,
         CM: 0,
       };
-    
+    console.log(isDiscounted)
       testsRequested.forEach((test) => {
-        const price = isDiscounted ? test.discounted_price : test.price;
-    
+        const price = isDiscounted === true ? test.discounted_price : test.price;
         if (sectionTotals.hasOwnProperty(test.section)) {
           sectionTotals[test.section] += price;
         }
@@ -62,6 +63,10 @@ OrderRouter.post('/add-order/:pid/:isDisc/:encoder/', async (req, res, next) => 
 
       for (const test of testsRequested) {
 
+        if (!sections[test.section]) {
+          sections[test.section] = [];
+        }
+
         if (test.package) {
           // find in packages schema
           const profile = await Model.PackageModel.findOne({ name: test.testcode }).populate('tests');
@@ -76,15 +81,13 @@ OrderRouter.post('/add-order/:pid/:isDisc/:encoder/', async (req, res, next) => 
               });
             });
           }
-        }
+        }else{
+          sections[test.section].push({
+            test: test._id,
+          });
 
-        if (!sections[test.section]) {
-          sections[test.section] = [];
         }
-        // check if test is a package
-        sections[test.section].push({
-          test: test._id,
-        });
+        
       }
       
       return sections;
@@ -92,7 +95,7 @@ OrderRouter.post('/add-order/:pid/:isDisc/:encoder/', async (req, res, next) => 
 
     const groupedSections = await groupTestsBySection(testsRequested);
     
-    console.log('Grouped Sections:', groupedSections);
+    // console.log('Grouped Sections:', groupedSections);
     
     
 
@@ -161,6 +164,66 @@ OrderRouter.get('/all-orders', async (req, res) => {
       .sort({ createdAt: -1 }); // Sort by creation date (most recent first)
 
     res.json({ message: 'Orders fetched successfully.', orders });
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+    res.json({ error: 'Error fetching orders.' });
+  }
+});
+
+//fetch section orders
+OrderRouter.get('/section-orders/:section', async (req, res) => {
+  const { section } = req.params;
+  if (!section) {
+    return res.status(400).json({ message: 'Section is required.' });
+  }
+  try {
+    // Fetch all orders and optionally populate related fields
+    const orders = await Model.SectionOrderModel.find({ section })
+      .populate('tests') // Populate test details
+      .populate('tests.test', 'testcode testname show options unit reference_value_male reference_value_female') // Populate test details
+      .populate('patient', 'firstname lastname middlename pid') // Populate patient details
+      .populate({
+        path: 'labnumber',
+        populate: {
+          path: 'tests.test',
+          select: 'testcode testname section', // Populate labnumber.tests.test details
+        },
+      }) // Populate labnumber and its tests
+      .sort({ createdAt: -1 }); // Sort by creation date (most recent first)
+
+    res.json({ message: 'Section orders fetched successfully.', orders });
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+    res.json({ error: 'Error fetching orders.' });
+  }
+});
+
+
+// fetch section orders by id
+OrderRouter.get('/section-orders/:section_orderid/:section', async (req, res) => {
+  const { section, section_orderid } = req.params;
+  if (!section) {
+    return res.status(400).json({ message: 'Section is required.' });
+  }
+  if (!section_orderid) {
+    return res.status(400).json({ message: 'Section order ID is required.' });
+  }
+  try {
+    // Fetch all orders and optionally populate related fields
+    const orders = await Model.SectionOrderModel.findOne({ _id: section_orderid, section: section })
+      .populate('tests') // Populate test details
+      .populate('tests.test', 'testcode name show package options unit reference_value_male reference_value_female') // Populate test details
+      .populate('patient', 'firstname lastname middlename pid age gender') // Populate patient details
+      .populate({
+        path: 'labnumber',
+        populate: {
+          path: 'tests.test',
+          select: 'testcode testname section', // Populate labnumber.tests.test details
+        },
+      }) // Populate labnumber and its tests
+      .sort({ createdAt: -1 }); // Sort by creation date (most recent first)
+
+    res.json({ message: 'Section orders fetched successfully.', orders });
   } catch (error) {
     console.error('Error fetching orders:', error);
     res.json({ error: 'Error fetching orders.' });

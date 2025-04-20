@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Table from 'react-bootstrap/Table';
@@ -30,7 +30,7 @@ function OrderDetailsModal({ orderDetails, handleDetailModal, detailModalShown }
         <Modal.Body>
           <div>
             <h5>Patient Information</h5>
-            <p><strong>Patient ID:</strong> {orderDetails.patient.pid ? orderDetails.patient.pid : 'N/A'}</p>
+            <p><strong>Patient ID:</strong> {orderDetails.patient.pid}</p>
             <p><strong>Patient Name:</strong> {orderDetails.patient.firstname} {orderDetails.patient.lastname}</p>
             
             <h5>Test Information</h5>
@@ -41,7 +41,7 @@ function OrderDetailsModal({ orderDetails, handleDetailModal, detailModalShown }
             <p><strong>Order Remarks:</strong> {orderDetails.remarks}</p>
 
             <h5>Order Statement</h5>
-            {/* <Table size='sm' hover responsive>
+            <Table size='sm' hover responsive>
             <thead className="table-secondary">
               <tr>
                 <th className="">Test</th>
@@ -51,10 +51,12 @@ function OrderDetailsModal({ orderDetails, handleDetailModal, detailModalShown }
             <tbody>{orderDetails.tests.length > 0 && orderDetails.tests.map(test => (
               <tr key={test.test.id}>
                 <td>{test.test.testcode}</td>
-                <td>{test.test.price}</td>
+                <td>{orderDetails.isDiscounted ? test.test.discounted_price : test.test.price}</td>
               </tr>
-            ))}</tbody>
-          </Table> */}
+            ))}
+            <tr><td>Total:</td><td>{orderDetails.total}</td></tr>
+            </tbody>
+          </Table>
           </div>
 
           <Button variant="primary">

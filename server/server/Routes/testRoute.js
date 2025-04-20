@@ -36,13 +36,15 @@ TestRouter.get('/all', async (req, res) => {
         return res.status(400).json({ message: 'Some tests are invalid or not found.' });
       }
   
-      // Map valid tests to include only necessary fields
-   
+      // Sort validTests to match the order of testcodes in the request
+      const sortedTests = testcodes.map((testcode) =>
+        validTests.find((test) => test.testcode === testcode)
+      );
   
       // Create the package
       const newPackage = new Model.PackageModel({
         name,
-        tests: validTests.map((test) => ({ _id: test._id })), // Include the mapped test details
+        tests: sortedTests.map((test) => ({ _id: test._id })), // Include the mapped test details
       });
   
       const savedPackage = await newPackage.save();

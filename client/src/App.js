@@ -12,6 +12,8 @@ import Orders from './pages/reception/Orders';
 import NotFound from './pages/NotFound';
 import Signup from './pages/Signup';
 import PatientDetails from './pages/reception/PatientDetails';
+import SectionTab from './pages/laboratory/SectionTab';
+import SectionOrder from './pages/laboratory/SectionOrder';
 
 
 function App() {
@@ -44,9 +46,9 @@ function App() {
                 <LabLayout />
               </ProtectedRoute>
           }>
-            {/* <Route path="/" element={<h1>Patient Search</h1>} />
-            <Route path="pt-reg" element={<h1>Patient Registration</h1>} />
-            <Route path="orders" element={<h1>Orders Page</h1>} /> */}
+            <Route path="/lab/:section" element={<SectionTab />} />
+            <Route path="/lab/:section/:orderid" element={<SectionOrder />} />
+            {/* <Route path="orders" element={<h1>Orders Page</h1>} /> */}
           
           </Route>
 

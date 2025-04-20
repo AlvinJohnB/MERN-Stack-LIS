@@ -252,7 +252,7 @@ export default function PtAddOrder() {
                 {testsCart.map((test, index) => (
                   <tr key={index}>
                     <td>{test.name}</td>
-                    <td>PHP {test.price}</td>
+                    <td>PHP {isDiscounted ? test.discounted_price : test.price}</td>
                     <td>
                       <button
                         type="button"
