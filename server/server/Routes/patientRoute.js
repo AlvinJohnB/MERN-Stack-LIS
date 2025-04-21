@@ -36,7 +36,7 @@ const PatientRouter = express.Router();
                 });
 
                 await newPatient.save();
-                res.status(201).json({ message: 'Patient created successfully' });
+                res.json({ message: 'Patient created successfully', patient: newPatient });
             } catch (error) {
                 next(error);
             }

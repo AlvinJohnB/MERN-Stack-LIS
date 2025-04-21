@@ -45,7 +45,8 @@ export default function PtReg() {
       if(response.data.errormessage) {
         alert(response.data.errormessage);
       } else {
-        navigate(`/pt-add-order/${ptId}`);
+        // console.log(response.data)
+        navigate(`/pt-add-order/${response.data.patient._id}`);
       }
     } catch (error) {
       alert('Failed to register patient. Please try again.');
