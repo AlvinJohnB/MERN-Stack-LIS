@@ -15,6 +15,41 @@ TestRouter.get('/all', async (req, res) => {
   });
 
 
+  // Route to add a new test
+TestRouter.post('/add-test', async (req, res) => {
+  const { testcode, testname, price, discounted_price, options, show, reference_value_male, reference_value_female, unit, section } = req.body;
+
+  try {
+      // Check if a test with the same testcode already exists
+      const existingTest = await Model.TestModel.findOne({ testcode, name: testname });
+      if (existingTest) {
+          return res.json({ errormessage: 'Test with this code already exists.' });
+      }
+
+      // Create a new test
+      const newTest = new Model.TestModel({
+          testcode,
+          name: testname,
+          price,
+          discounted_price,
+          options,
+          show: show ? true : false,
+          reference_value_male,
+          reference_value_female,
+          unit,
+          section,
+          isquali: options? true : false
+      });
+
+      const savedTest = await newTest.save();
+      res.json({ message: 'Test added successfully.', test: savedTest });
+  } catch (error) {
+      console.error('Error adding test:', error);
+      res.status(500).json({ errormessage: 'Error adding test.' });
+  }
+});
+
+
 
   TestRouter.post('/create-package', async (req, res) => {
     const { name, tests } = req.body;

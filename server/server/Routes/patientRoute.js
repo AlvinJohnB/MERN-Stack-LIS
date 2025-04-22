@@ -48,13 +48,14 @@ const PatientRouter = express.Router();
         });
 
 
-    PatientRouter.get('/search', async (req, res) => {
-        const { lastname, firstname } = req.query;
+    PatientRouter.post('/search', async (req, res) => {
+        const { lastname, firstname } = req.body;
       
         try {
           const patients = await Model.PatientModel.find({
             lastname: { $regex: new RegExp(lastname, 'i') }, // Case-insensitive search
             firstname: { $regex: new RegExp(firstname, 'i') }, // Case-insensitive search
+          
           });
       
           if (patients.length === 0) {

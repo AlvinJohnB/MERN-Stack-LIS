@@ -32,7 +32,7 @@ export default function PtSreach() {
     console.log('Searching for:', { lastname, firstname });
     // Add your search logic here
     try {
-      const response = await axios.get('http://localhost:5000/patient/search', {
+      const response = await axios.post('http://localhost:5000/patient/search', {
         lastname,
         firstname,
       });

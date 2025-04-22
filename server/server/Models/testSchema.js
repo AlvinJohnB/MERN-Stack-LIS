@@ -33,7 +33,7 @@ const testschema = new mongoose.Schema(
     },
     show: {
       type: Boolean,
-      default: false,
+      default: true,
     },
     package: {
       type: Boolean,

@@ -82,6 +82,11 @@ export default function Layout() {
                 </Link>
               </li>
               <li className="nav-item">
+                <Link className="nav-link text-white" to="/manage">
+                  Manage
+                </Link>
+              </li>
+              <li className="nav-item">
                 <Link className="nav-link text-white" to="/lab">
                   Laboratory
                 </Link>

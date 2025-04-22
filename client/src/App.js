@@ -14,6 +14,10 @@ import Signup from './pages/Signup';
 import PatientDetails from './pages/reception/PatientDetails';
 import SectionTab from './pages/laboratory/SectionTab';
 import SectionOrder from './pages/laboratory/SectionOrder';
+import Report from './pages/report/Report';
+import AddTest from './pages/manage/AddTest';
+import ManageLayout from './pages/manage/ManageLayout';
+import Tests from './pages/manage/Tests';
 
 
 function App() {
@@ -37,6 +41,8 @@ function App() {
             <Route path="pt-add-order/:id" element={<PtAddOrder />} />
             <Route path="orders" element={<Orders />} />
             <Route path="patient/:id" element={<PatientDetails />} />
+            <Route path="/report" element={<Report />} />
+
           
           </Route>
 
@@ -51,6 +57,20 @@ function App() {
             {/* <Route path="orders" element={<h1>Orders Page</h1>} /> */}
           
           </Route>
+
+          <Route path='/manage' element={
+              <ProtectedRoute>
+                {/* Add the component that should be protected here */}
+                <ManageLayout />
+              </ProtectedRoute>
+          }>
+            
+            
+            <Route path="/manage" element={<Tests />} />
+          
+          </Route>
+
+          
 
 
         
