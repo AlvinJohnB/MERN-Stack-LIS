@@ -10,18 +10,30 @@ TestRouter.get('/all', async (req, res) => {
       const tests = await Model.TestModel.find(); // Fetch all tests from the database
       res.json(tests);
     } catch (error) {
-      res.status(500).json({ error: 'Error fetching tests' });
+      res.json({ error: 'Error fetching tests' });
     }
   });
+
+// Route to fetch all tests
+TestRouter.post('/get-test/:id', async (req, res) => {
+  const { id } = req.params
+  console.log(id)
+  try {
+    const test = await Model.TestModel.findOne({ _id: id }); // Fetch all tests from the database
+    res.json(test);
+  } catch (error) {
+    res.json({ error: 'Error fetching tests' });
+  }
+});
 
 
   // Route to add a new test
 TestRouter.post('/add-test', async (req, res) => {
-  const { testcode, testname, price, discounted_price, options, show, reference_value_male, reference_value_female, unit, section } = req.body;
+  const { testcode, name, price, discounted_price, options, show, reference_value_male, reference_value_female, unit, section } = req.body;
 
   try {
       // Check if a test with the same testcode already exists
-      const existingTest = await Model.TestModel.findOne({ testcode, name: testname });
+      const existingTest = await Model.TestModel.findOne({ testcode, name: name });
       if (existingTest) {
           return res.json({ errormessage: 'Test with this code already exists.' });
       }
@@ -33,7 +45,7 @@ TestRouter.post('/add-test', async (req, res) => {
           price,
           discounted_price,
           options,
-          show: show ? true : false,
+          show: show === null ? false : true,
           reference_value_male,
           reference_value_female,
           unit,
@@ -48,6 +60,55 @@ TestRouter.post('/add-test', async (req, res) => {
       res.status(500).json({ errormessage: 'Error adding test.' });
   }
 });
+
+// Route to update a test
+TestRouter.put('/update-test/:id', async (req, res) => {
+  const { id } = req.params;
+  const {
+    testcode,
+    name,
+    price,
+    discounted_price,
+    options,
+    show,
+    reference_value_male,
+    reference_value_female,
+    unit,
+    section,
+  } = req.body;
+
+  console.log(show)
+
+  try {
+    // Find the test by ID
+    const existingTest = await Model.TestModel.findById(id);
+
+    if (!existingTest) {
+      return res.json({ errormessage: 'Test not found.' });
+    }
+
+    // Update the test fields
+    existingTest.testcode = testcode || existingTest.testcode;
+    existingTest.name = name || existingTest.name;
+    existingTest.price = price || existingTest.price;
+    existingTest.discounted_price = discounted_price || existingTest.discounted_price;
+    existingTest.options = options || existingTest.options;
+    existingTest.show = !show ? false : true,
+    existingTest.reference_value_male = reference_value_male || existingTest.reference_value_male;
+    existingTest.reference_value_female = reference_value_female || existingTest.reference_value_female;
+    existingTest.unit = unit || existingTest.unit;
+    existingTest.section = section || existingTest.section;
+    existingTest.isquali = options ? true : false;
+
+    // Save the updated test
+    const updatedTest = await existingTest.save();
+    res.status(200).json({ message: 'Test updated successfully.', test: updatedTest });
+  } catch (error) {
+    console.error('Error updating test:', error);
+    res.status(500).json({ error: 'Error updating test.' });
+  }
+});
+
 
 
 

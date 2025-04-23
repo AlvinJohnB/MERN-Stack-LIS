@@ -7,15 +7,15 @@ export default function TestForm({ handleSubmit, type, test = {} }) {
         {/* Left section */}
         <div className="col-12 col-md-5 mx-md-3 mb-4">
           <div className="form-group">
-            <label htmlFor="testname">Test Name</label>
+            <label htmlFor="name">Test Name</label>
             <input
               required
               type="text"
-              name="testname"
+              name="name"
               className="form-control"
-              id="testname"
+              id="name"
               placeholder="Enter test name"
-              defaultValue={test.testname || ''}
+              defaultValue={test.name || ''}
             />
           </div>
 
@@ -108,26 +108,26 @@ export default function TestForm({ handleSubmit, type, test = {} }) {
           </div>
 
           <div className="form-group">
-            <label htmlFor="refMale">Reference Value for Male</label>
+            <label htmlFor="reference_value_male">Reference Value for Male</label>
             <input
               type="text"
-              name="refMale"
+              name="reference_value_male"
               className="form-control"
-              id="refMale"
+              id="reference_value_male"
               placeholder="Enter reference value for male"
-              defaultValue={test.refMale || ''}
+              defaultValue={test.reference_value_male || ''}
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="refFemale">Reference Value for Female</label>
+            <label htmlFor="reference_value_female">Reference Value for Female</label>
             <input
               type="text"
-              name="refFemale"
+              name="reference_value_female"
               className="form-control"
-              id="refFemale"
+              id="reference_value_female"
               placeholder="Enter reference value for female"
-              defaultValue={test.refFemale || ''}
+              defaultValue={test.reference_value_female || ''}
             />
           </div>
 

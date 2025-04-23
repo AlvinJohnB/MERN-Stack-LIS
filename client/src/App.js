@@ -18,6 +18,7 @@ import Report from './pages/report/Report';
 import AddTest from './pages/manage/AddTest';
 import ManageLayout from './pages/manage/ManageLayout';
 import Tests from './pages/manage/Tests';
+import EditTest from './pages/manage/EditTest';
 
 
 function App() {
@@ -66,7 +67,8 @@ function App() {
           }>
             
             
-            <Route path="/manage" element={<Tests />} />
+            <Route path="/manage/" element={<Tests />} />
+            <Route path="/manage/edit-test/:id" element={<EditTest />} />
           
           </Route>
 
