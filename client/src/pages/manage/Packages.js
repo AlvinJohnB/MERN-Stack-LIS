@@ -13,36 +13,35 @@ import { IoIosAddCircleOutline } from "react-icons/io";
 export default function Tests() {
 
   const navigate = useNavigate()
-  const [tests, setTests] = useState([])
+  const [packages, setPackages] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [pageNumber, setPageNumber] = useState(0);
 
   const [filter, setFilter] = useState('');
 
-  const filteredTests = tests.filter((test) =>
-    test.name.toLowerCase().includes(filter.toLowerCase()) ||
-    test.testcode.toLowerCase().includes(filter.toLowerCase())
+  const filteredTests = packages.filter((item) =>
+    item.name.toLowerCase().includes(filter.toLowerCase())
   );
     
   
   
-  const ordersPerPage = 10; 
-  const pagesVisited = pageNumber * ordersPerPage;
-  const pageCount = Math.ceil(tests.length / ordersPerPage);
+  const packagesPerPage = 10; 
+  const pagesVisited = pageNumber * packagesPerPage;
+  const pageCount = Math.ceil(packages.length / packagesPerPage);
   
   const changePage = ({ selected }) => {
     setPageNumber(selected);
   };
 
-  const fetchTests = async () => {
+  const fetchPackages = async () => {
     try{
 
-      const response = await axios.get(`http://localhost:5000/test/all`)
+      const response = await axios.get(`http://localhost:5000/test/packages/fetch-all`)
       if(response.data.error){
         alert(response.data.error)
       }
       else{
-        setTests(response.data)
+        setPackages(response.data)
         console.log(response.data)
         setIsLoading(false)
       }
@@ -54,26 +53,26 @@ export default function Tests() {
   }
   useEffect(()=>{
 
-    fetchTests()
+    fetchPackages()
 
   },[])
 
   
 
-  const displayTests = tests.length > 0 ? filteredTests
-      .slice(pagesVisited, pagesVisited + ordersPerPage)
-      .map((test, index) => (
+  const displayPackages = packages.length > 0 ? filteredTests
+      .slice(pagesVisited, pagesVisited + packagesPerPage)
+      .map((item, index) => (
         <tr key={index}>
-          <td className="">{test.testcode}</td>
-          <td className="">{test.name}</td>
-          <td className="text-center">{test.show === true ? <ImCheckboxChecked />: <ImCheckboxUnchecked/>} </td>
+          <td className="">{item.name}</td>
+          <td className="">{item.tests}</td>
+          {/* <td className="text-center">{test.show === true ? <ImCheckboxChecked />: <ImCheckboxUnchecked/>} </td>
           <td className="text-center">{test.section}</td>
           <td className="text-center">{test.reference_value_male}</td>
           <td className="text-center">{test.reference_value_female}</td>
           <td className="text-center">{test.unit}</td>
           <td className="text-center">&#8369; {test.price}</td>
-          <td className="text-center">&#8369; {test.discounted_price}</td>
-          <td className="text-center"><Link to={`/manage/edit-test/${test._id}`}><FaRegEdit /></Link></td>
+          <td className="text-center">&#8369; {test.discounted_price}</td> */}
+          <td className="text-center"><Link to={`/manage/edit-test/${item._id}`}><FaRegEdit /></Link></td>
         </tr>
       )): null;
 
@@ -91,25 +90,25 @@ export default function Tests() {
 
   return (
     <div className = 'container-fluid mt-4'>
-        <h4 align="center">Tests list</h4>
+        <h4 align="center">Packages list</h4>
 
         <div className = "d-flex justify-content-between">
 
         <div className="mb-3 col-md-3">
             <label htmlFor="search" className="form-label">
-              Search Test:
+              Search Package:
             </label>
             <input
               type="text"
               id="search"
               className="form-control border-secondary"
-              placeholder="Search tests..."
+              placeholder="Search package..."
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
             />
           </div>
           <div className ='align-self-end mb-3'>
-            <Button variant="primary" size="sm" onClick={() => {navigate('/manage/add-test')}}><IoIosAddCircleOutline /> Add Test</Button>
+            <Button variant="primary" size="sm" onClick={() => {navigate('/manage/add-package')}}><IoIosAddCircleOutline /> Add Package</Button>
           </div>
 
         </div>
@@ -121,19 +120,12 @@ export default function Tests() {
         <Table size='xl' hover bordered responsive>
         <thead className="table-secondary">
           <tr>
-            <th className="">Test code</th>
-            <th className="">Test name</th>
-            <th className="text-center">Show</th>
-            <th className="text-center">Section</th>
-            <th className="text-center">Ref male</th>
-            <th className="text-center">Ref female</th>
-            <th className="text-center">Unit</th>
-            <th className="mob text-center">Price</th>
-            <th className="mob text-center">Disc. price</th>
+            <th className="">Test Pofile</th>
+            <th className="">Tests</th>
             <th className="text-center">Action</th>
           </tr>
         </thead>
-        <tbody>{tests.length > 0 && displayTests}</tbody>
+        {/* <tbody>{packages.length > 0 && displayPackages}</tbody> */}
       </Table>
 
       {pageCount > 1 && (

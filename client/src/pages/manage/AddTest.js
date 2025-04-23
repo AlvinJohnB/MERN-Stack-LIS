@@ -1,8 +1,12 @@
 import React from 'react'
 import axios from 'axios'
 import TestForm from './components/TestForm';
+import { useNavigate } from 'react-router-dom';
+
 
 export default function AddTest() {
+
+  const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -19,6 +23,7 @@ export default function AddTest() {
                 alert(response.data.errormessage)
             }else{
                 alert(response.data.message)
+                navigate('/manage/')
             }
             
         }
@@ -26,8 +31,7 @@ export default function AddTest() {
             alert('Error encountered in adding test.')
         }
       
-        // Submit `data` to your backend here (e.g. via fetch or axios)
-      };
+              };
 
       
 

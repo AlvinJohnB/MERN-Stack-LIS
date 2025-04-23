@@ -62,7 +62,7 @@ export default function LabLayout() {
                     <Nav.Link onClick={handleNavLinkClick} className='text-white' as={Link} to="/">Reception</Nav.Link>
                     <Nav.Link onClick={handleNavLinkClick} className='text-white' as={Link} to="/lab/Chemistry">Laboratory</Nav.Link>
                     <Nav.Link onClick={handleNavLinkClick} className='text-white' as={Link} to="/manage">Test</Nav.Link>
-                    <Nav.Link onClick={handleNavLinkClick} className='text-white' as={Link} to="/lab/Clinical Microscopy">Packages</Nav.Link>
+                    <Nav.Link onClick={handleNavLinkClick} className='text-white' as={Link} to="/manage/packages">Packages</Nav.Link>
                     {/* <Nav.Link onClick={handleNavLinkClick} className='text-white' as={Link} to="/lab/Serology">Serology</Nav.Link> */}
                    
                   </Nav>

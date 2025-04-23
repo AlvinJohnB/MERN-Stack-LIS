@@ -41,7 +41,7 @@ TestRouter.post('/add-test', async (req, res) => {
       // Create a new test
       const newTest = new Model.TestModel({
           testcode,
-          name: testname,
+          name: name,
           price,
           discounted_price,
           options,
@@ -151,6 +151,16 @@ TestRouter.put('/update-test/:id', async (req, res) => {
     }
   });
 
+
+  // Route to fetch all packages
+TestRouter.get('/packages/fetch-all', async (req, res) => {
+  try {
+    const packages = await Model.PackageModel.find(); // Fetch all tests from the database
+    res.json(packages);
+  } catch (error) {
+    res.json({ error: 'Error fetching packages' });
+  }
+});
   
   TestRouter.get('/package/:id', async (req, res) => {
     const { id } = req.params;
