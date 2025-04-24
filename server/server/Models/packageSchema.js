@@ -7,11 +7,13 @@ const packageSchema = new mongoose.Schema(
       required: true,
     },
     tests: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Test',
-      },
-    ],
+          {
+            test: {
+              type: mongoose.Schema.Types.ObjectId,
+              ref: 'Test',
+            }
+          }
+        ],
   },
   {
     timestamps: true,

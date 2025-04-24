@@ -49,7 +49,7 @@ function OrderDetailsModal({ orderDetails, handleDetailModal, detailModalShown }
               </tr>
             </thead>
             <tbody>{orderDetails.tests.length > 0 && orderDetails.tests.map(test => (
-              <tr key={test.test.id}>
+              <tr key={test.test._id}>
                 <td>{test.test.testcode}</td>
                 <td>{orderDetails.isDiscounted ? test.test.discounted_price : test.test.price}</td>
               </tr>

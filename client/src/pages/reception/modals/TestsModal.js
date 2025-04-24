@@ -1,9 +1,10 @@
+
 import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Table from 'react-bootstrap/Table';
 
-function TestsModal({ modalShown, handleTestModal, tests, handleAddTest }) {
+function TestsModal({ modalShown, handleTestModal, tests, handleAddTest, showAll, isLabModule}) {
 
   const [filter, setFilter] = useState('');
   const filteredTests = tests.filter((test) =>
@@ -49,20 +50,30 @@ function TestsModal({ modalShown, handleTestModal, tests, handleAddTest }) {
               </tr>
             </thead>
             <tbody>
-                {Array.isArray(tests) && tests.length > 0 && filteredTests.map((test) => (
-                <tr key={test._id}>
-                  {test.show && 
-                  <>
-                    <td>{test.testcode}</td>
-                    <td>{test.name}</td>
-                    <td>
-                      <Button variant="success" size='sm' onClick={() => handleAddTest(test)}>Select</Button>
-                    </td>
-                  </>  
-                  }
-                </tr>
-                
+              {Array.isArray(tests) && tests.length > 0 && filteredTests.map((test) => (
+                  <tr key={test._id}>
+                    {showAll === true ? 
+                     
+                    <>
+                      <td>{test.testcode}</td>
+                      <td>{test.name}</td>
+                      <td>
+                        <Button variant={isLabModule === true ? `primary`: `success`} size='sm' onClick={() => handleAddTest(test)}>Select</Button>
+                      </td>
+                    </>  
+                     :
+                    test.show &&
+                    <>
+                      <td>{test.testcode}</td>
+                      <td>{test.name}</td>
+                      <td>
+                        <Button variant="success" size='sm' onClick={() => handleAddTest(test)}>Select</Button>
+                      </td>
+                    </>  
+                    }
+                  </tr>
               ))}
+                
               
             </tbody>
           </Table>
@@ -81,3 +92,18 @@ function TestsModal({ modalShown, handleTestModal, tests, handleAddTest }) {
 }
 
 export default TestsModal;
+
+// {Array.isArray(tests) && tests.length > 0 && filteredTests.map((test) => (
+//   <tr key={test._id}>
+//     {test.show && 
+//     <>
+//       <td>{test.testcode}</td>
+//       <td>{test.name}</td>
+//       <td>
+//         <Button variant="success" size='sm' onClick={() => handleAddTest(test)}>Select</Button>
+//       </td>
+//     </>  
+//     }
+//   </tr>
+  
+// ))}

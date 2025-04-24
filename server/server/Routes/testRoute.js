@@ -140,7 +140,7 @@ TestRouter.put('/update-test/:id', async (req, res) => {
       // Create the package
       const newPackage = new Model.PackageModel({
         name,
-        tests: sortedTests.map((test) => ({ _id: test._id })), // Include the mapped test details
+        tests: sortedTests.map((test) => ({test: test._id})), // Include the mapped test details
       });
   
       const savedPackage = await newPackage.save();
@@ -151,11 +151,14 @@ TestRouter.put('/update-test/:id', async (req, res) => {
     }
   });
 
-
+  
   // Route to fetch all packages
 TestRouter.get('/packages/fetch-all', async (req, res) => {
   try {
-    const packages = await Model.PackageModel.find(); // Fetch all tests from the database
+    const packages = await Model.PackageModel.find().populate({
+      path: 'tests',
+      model: 'TestModel', // Ensure this matches the name of your TestModel
+    }); // Fetch all tests from the database
     res.json(packages);
   } catch (error) {
     res.json({ error: 'Error fetching packages' });

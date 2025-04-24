@@ -6,13 +6,13 @@ import { IoIosAddCircleOutline } from "react-icons/io";
 import TestsModal from '../../reception/modals/TestsModal'
 import axios from 'axios'
 
-export default function PackageForm({handleSubmit, type}) {
+export default function PackageForm({handleSubmit, type, items, setItems}) {
 
     const navigate = useNavigate();
 
-    const [modalShown, setModalShown] = useState(true)
+    const [modalShown, setModalShown] = useState(false)
     const [tests, setTests] = useState([])
-    const [items, setItems] = useState([])
+    // const [items, setItems] = useState([])
 
     const fetchTests = async () => {
         try{
@@ -44,6 +44,8 @@ export default function PackageForm({handleSubmit, type}) {
         setModalShown(false)
     }
 
+
+
     
 
   return (
@@ -56,43 +58,37 @@ export default function PackageForm({handleSubmit, type}) {
             {/* Left section */}
             <div className="col-12 col-md-5 mx-md-3 mb-4">
                 <div className="form-group">
-                <label htmlFor="testname">Profile Name</label>
-                <input required type="text" name="testname" className="form-control" id="testname" placeholder="Enter test name" />
+                <label htmlFor="name">Profile Name</label>
+                <input required type="text" name="name" className="form-control" id="name" placeholder="Enter test name" />
                 </div>
 
-                <div className="form-group mb-3 mt-1">
-                <label htmlFor="section" className="form-label m-0">Section</label>
-                <select className="form-select m-0" name="section" id="section">
-                    <option selected>Select one</option>
-                    <option value="Chemistry">Chemistry</option>
-                    <option value="Hematology">Hematology</option>
-                    <option value="Clinical Microscopy">Clinical Microscopy</option>
-                    <option value="Serology">Serology</option>
-                </select>
-                </div>
-
-                
-                <div className="form-group">
-                <label>Tests</label>
-                <div className="border bg-light rounded">
-                    <div className = 'border-bottom text-center m-0 p-0'> <span>Total Cholesterol</span> <span type='button'><CiCircleRemove /></span></div>
-                    {/* <div className = 'text-center bg-secondary m-0 p-0'> <span>Total Cholesterol</span> <span><CiCircleRemove /></span></div> */}
-                    
-
+                  
+                  <div className="form-group">
+                  <label>Tests</label>
+                  <div className="border bg-light rounded">
+                  {items.map((item, index) => (
+                      <div key={index} className = 'border-bottom text-center m-0 p-0'> <span>{item.name}</span> <span onClick={() => setItems(items.filter((_, i) => i !== index))} type='button'><CiCircleRemove /></span></div>
+                  ))}
 
                 </div>
 
-                <Button variant="primary" className='mt-3' size="sm" onClick={() => {navigate('/manage/add-package')}}><IoIosAddCircleOutline /> Add Test</Button>
+                <Button variant="primary" className='mt-3' size="sm" onClick={() => {setModalShown(true)}}><IoIosAddCircleOutline /> Add Test</Button>
 
                 </div>
-            </div>
-            </div>
-
-            {/* <div>
-                <button type="submit" className="btn btn-success mt-3">
-                    Add Package
+                <hr />
+                <div align="center">
+                <button type="submit" className="btn btn-primary col-md-5">
+                    {type === 'add' ? `Add Package` : `Update Package`}
                 </button>
-                </div> */}
+                </div>
+                
+            </div>
+
+            </div>
+
+            
+
+            
         </form>
         <TestsModal
         modalShown={modalShown}
@@ -100,6 +96,8 @@ export default function PackageForm({handleSubmit, type}) {
         tests={tests}
         setTests={setTests}
         handleAddTest={handleAddTest}
+        showAll={true}
+        isLabModule={true}
       />
     </div>
   )

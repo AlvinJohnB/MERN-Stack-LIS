@@ -1,20 +1,22 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import PackageForm from './components/PackageForm';
 
 export default function AddPackage() {
+
+    const [items, setItems] = useState([])
 
     const handleSubmit = async (e) => {
         e.preventDefault();
       
         const formData = new FormData(e.target);
         const data = Object.fromEntries(formData.entries());
-      
+        data.tests = items
         console.log(data); // testname, testcode, price, etc.
 
         try{
 
-            const response = await axios.post('http://localhost:5000/test/add-test', data)
+            const response = await axios.post('http://localhost:5000/test/create-package', data)
             if(response.data.errormessage){
                 alert(response.data.errormessage)
             }else{
@@ -26,7 +28,7 @@ export default function AddPackage() {
             alert('Error encountered in adding test.')
         }
       
-        // Submit `data` to your backend here (e.g. via fetch or axios)
+
       };
 
       
@@ -35,7 +37,7 @@ export default function AddPackage() {
     <div className="container-fluid">
     <h5 className="text-center my-4">Add Profile</h5>
 
-    <PackageForm handleSubmit={handleSubmit}/>
+    <PackageForm handleSubmit={handleSubmit} type="add" setItems={setItems} items={items}/>
 
   
 </div>

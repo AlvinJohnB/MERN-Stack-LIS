@@ -59,20 +59,21 @@ export default function Tests() {
 
   
 
-  const displayPackages = packages.length > 0 ? filteredTests
+  const displayPackages = packages.length > 0 ? packages
       .slice(pagesVisited, pagesVisited + packagesPerPage)
       .map((item, index) => (
         <tr key={index}>
           <td className="">{item.name}</td>
           <td className="">{item.tests}</td>
-          {/* <td className="text-center">{test.show === true ? <ImCheckboxChecked />: <ImCheckboxUnchecked/>} </td>
-          <td className="text-center">{test.section}</td>
+          {/* <td className="">{item.tests.map(t => t.test.testcode).join(', ')}</td> */}
+          {/* {/* <td className="text-center">{test.show === true ? <ImCheckboxChecked />: <ImCheckboxUnchecked/>} </td> */}
+          {/* <td className="text-center">{test.section}</td>
           <td className="text-center">{test.reference_value_male}</td>
           <td className="text-center">{test.reference_value_female}</td>
           <td className="text-center">{test.unit}</td>
           <td className="text-center">&#8369; {test.price}</td>
           <td className="text-center">&#8369; {test.discounted_price}</td> */}
-          <td className="text-center"><Link to={`/manage/edit-test/${item._id}`}><FaRegEdit /></Link></td>
+          {/* <td className="text-center"><Link to={`/manage/edit-test/${item._id}`}><FaRegEdit /></Link></td>  */}
         </tr>
       )): null;
 
@@ -125,7 +126,7 @@ export default function Tests() {
             <th className="text-center">Action</th>
           </tr>
         </thead>
-        {/* <tbody>{packages.length > 0 && displayPackages}</tbody> */}
+        <tbody>{packages.length > 0 && displayPackages}</tbody>
       </Table>
 
       {pageCount > 1 && (
