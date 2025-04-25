@@ -5,7 +5,9 @@ import { useNavigate } from 'react-router-dom';
 
 const Signup = () => {
 
-    const navigate = useNavigate();
+  const apiUrl = process.env.REACT_APP_API_URL;
+
+  const navigate = useNavigate();
 
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
@@ -22,7 +24,7 @@ const Signup = () => {
     }
 
     // Perform sign-up logic here (e.g., API call)
-    await axios.post('http://localhost:5000/auth/signup', {
+    await axios.post(`${apiUrl}/auth/signup`, {
         name,
         username,
         password,
