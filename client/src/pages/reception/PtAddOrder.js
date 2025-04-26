@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 export default function PtAddOrder() {
 
   const navigate = useNavigate();
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   const [user, setUser] = useState({});
   const [ptData, setPtData] = useState(null); // Initialize as null
@@ -44,7 +45,7 @@ export default function PtAddOrder() {
       
     // API Call PtData       
     try{
-        await axios.get(`http://localhost:5000/patient/details/${id}`) // Use id instead of pId
+        await axios.get(`${apiUrl}/patient/details/${id}`) // Use id instead of pId
         .then((response) => {
             if(response.data.errormessage) {
                 alert(response.data.errormessage);
@@ -62,7 +63,7 @@ export default function PtAddOrder() {
     }
 
     try{
-        axios.get(`http://localhost:5000/test/all`) // Use id instead of pId
+        axios.get(`${apiUrl}/test/all`) // Use id instead of pId
         .then((response) => {
             if(response.data) {
               setTests(response.data);
@@ -134,7 +135,7 @@ export default function PtAddOrder() {
     // Add your form submission logic here
     try{
       
-      await axios.post(`http://localhost:5000/order/add-order/${id}/${isDiscounted}/${user._id}`, formData)
+      await axios.post(`${apiUrl}/order/add-order/${id}/${isDiscounted}/${user._id}`, formData)
       .then((response) => {
         if(response.data.errormessage) {
           alert(response.data.errormessage);

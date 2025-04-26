@@ -8,6 +8,7 @@ export default function PtReg() {
   const navigate = useNavigate();
   const [ptId] = useState(``); // Example patient ID
   const [patientAge, setPatientAge] = useState(0);
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   const initialValues = {
     lastname: '',
@@ -37,7 +38,7 @@ export default function PtReg() {
     values.age = patientAge;
 
     try {
-      const response = await axios.post('http://localhost:5000/patient/create', values, {
+      const response = await axios.post(`${apiUrl}/patient/create`, values, {
         headers: {
           'Content-Type': 'application/json',
         },

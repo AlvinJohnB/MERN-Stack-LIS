@@ -13,12 +13,14 @@ export default function AddTest() {
       
         const formData = new FormData(e.target);
         const data = Object.fromEntries(formData.entries());
+
+        const apiUrl = process.env.REACT_APP_API_URL;
       
         console.log(data); // testname, testcode, price, etc.
 
         try{
 
-            const response = await axios.post('http://localhost:5000/test/add-test', data)
+            const response = await axios.post(`${apiUrl}/test/add-test`, data)
             if(response.data.errormessage){
                 alert(response.data.errormessage)
             }else{

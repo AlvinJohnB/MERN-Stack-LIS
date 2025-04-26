@@ -11,10 +11,11 @@ export default function EditTest() {
     const [test, setTest] = useState({})
     const [isLoading, setIsLoading] = useState(true)
 
+    const apiUrl = process.env.REACT_APP_API_URL;
 
     const fetchTest = async () => {
       try{
-          const response = await axios.post(`http://localhost:5000/test/get-test/${id}`)
+          const response = await axios.post(`${apiUrl}/test/get-test/${id}`)
         if(response.data.error){
           alert(response.data.error)
         }
@@ -42,7 +43,7 @@ export default function EditTest() {
    
            try{
    
-               const response = await axios.put(`http://localhost:5000/test/update-test/${id}`, data)
+               const response = await axios.put(`${apiUrl}/test/update-test/${id}`, data)
                if(response.data.errormessage){
                    alert(response.data.errormessage)
                }else{

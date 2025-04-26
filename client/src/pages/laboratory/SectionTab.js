@@ -20,12 +20,13 @@ export default function SectionTab() {
   const [orders, setOrders] = useState([]);
   const [detailModalShown, setDetailModalShown] = useState(false)
 
+  const apiUrl = process.env.REACT_APP_API_URL;
 
 
   const fetchOrders = async () => {
     setIsLoading(true);
     try{
-      await axios.get(`http://localhost:5000/order/section-orders/${section}`)
+      await axios.get(`${apiUrl}/order/section-orders/${section}`)
         .then((response) => {
           setOrders(response.data.orders)
         })
@@ -97,7 +98,7 @@ export default function SectionTab() {
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
-      const response = await axios.post('http://localhost:5000/orders/filter', data); // Replace with your API endpoint
+      const response = await axios.post(`${apiUrl}/orders/filter`, data); // Replace with your API endpoint
       if (response.data.length === 0) {
         alert('Lab number not found!');
       } else {

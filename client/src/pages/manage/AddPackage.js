@@ -5,6 +5,7 @@ import PackageForm from './components/PackageForm';
 export default function AddPackage() {
 
     const [items, setItems] = useState([])
+    const apiUrl = process.env.REACT_APP_API_URL;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -16,7 +17,7 @@ export default function AddPackage() {
 
         try{
 
-            const response = await axios.post('http://localhost:5000/test/create-package', data)
+            const response = await axios.post(`${apiUrl}/test/create-package`, data)
             if(response.data.errormessage){
                 alert(response.data.errormessage)
             }else{

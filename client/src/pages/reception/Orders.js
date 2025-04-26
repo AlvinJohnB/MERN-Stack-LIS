@@ -18,10 +18,11 @@ export default function Orders() {
   const [detailModalShown, setDetailModalShown] = useState(false)
   const [orderDetails, setOrderDetails] = useState({})
 
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   const fetchOrders = async () => {
     try{
-      await axios.get('http://localhost:5000/order/all-orders')
+      await axios.get(`${apiUrl}/order/all-orders`)
         .then((response) => {
           setOrders(response.data.orders)
           setOrderDetails(response.data.orders[0])
@@ -96,7 +97,7 @@ export default function Orders() {
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
-      const response = await axios.post('http://localhost:5000/orders/filter', data); // Replace with your API endpoint
+      const response = await axios.post(`${apiUrl}/orders/filter`, data); // Replace with your API endpoint
       if (response.data.length === 0) {
         alert('Lab number not found!');
       } else {

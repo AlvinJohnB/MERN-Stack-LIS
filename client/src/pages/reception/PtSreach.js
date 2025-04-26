@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import Table from 'react-bootstrap/Table';
-import Button from 'react-bootstrap/Button';
 import ReactPaginate from 'react-paginate';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
@@ -16,7 +15,7 @@ export default function PtSreach() {
 
   const [pageNumber, setPageNumber] = useState(0);
     
-  
+  const apiUrl = process.env.REACT_APP_API_URL;
   
   const ordersPerPage = 10;
   const pagesVisited = pageNumber * ordersPerPage;
@@ -32,7 +31,7 @@ export default function PtSreach() {
     console.log('Searching for:', { lastname, firstname });
     // Add your search logic here
     try {
-      const response = await axios.post('http://localhost:5000/patient/search', {
+      const response = await axios.post(`${apiUrl}/patient/search`, {
         lastname,
         firstname,
       });

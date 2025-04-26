@@ -13,10 +13,12 @@ export default function SectionOrder() {
     const [isLoading, setIsLoading] = useState(true); // Loading state
     const [order, setOrder] = useState({});
 
+    const apiUrl = process.env.REACT_APP_API_URL;
+
     const fetchOrder = async () => {
         setIsLoading(true);
         try{
-          await axios.get(`http://localhost:5000/order/section-orders/${orderid}/${section}`)
+          await axios.get(`${apiUrl}/order/section-orders/${orderid}/${section}`)
             .then((response) => {
               setOrder(response.data.orders)
             })

@@ -18,6 +18,7 @@ export default function Tests() {
   const [pageNumber, setPageNumber] = useState(0);
 
   const [filter, setFilter] = useState('');
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   const filteredTests = packages.filter((item) =>
     item.name.toLowerCase().includes(filter.toLowerCase())
@@ -36,7 +37,7 @@ export default function Tests() {
   const fetchPackages = async () => {
     try{
 
-      const response = await axios.get(`http://localhost:5000/test/packages/fetch-all`)
+      const response = await axios.get(`${apiUrl}/test/packages/fetch-all`)
       if(response.data.error){
         alert(response.data.error)
       }

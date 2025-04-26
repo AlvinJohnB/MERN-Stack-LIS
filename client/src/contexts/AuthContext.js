@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
     const apiUrl = process.env.REACT_APP_API_URL;
     // Perform login logic here (e.g., API call)
     try {
-      const response = await axios.post(`${apiUrl}/auth/`, {
+      const response = await axios.post(`${apiUrl}/auth`, {
         username: username,
         password: password,
       });

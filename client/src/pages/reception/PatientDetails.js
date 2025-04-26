@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 export default function PatientDetails() {
   const { id } = useParams(); // Get the patient ID from the URL parameters
   const navigate = useNavigate(); // Initialize the history function
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   const [ptData, setPtData] = useState({}); // Initialize as null
   const [patientAge, setPatientAge] = useState(0);
@@ -20,7 +21,7 @@ export default function PatientDetails() {
     const fetchPtData = async () => {
         try{
             setIsLoading(true);
-            await axios.get(`http://localhost:5000/patient/details/${id}`)
+            await axios.get(`${apiUrl}/patient/details/${id}`)
             .then((response) => {
                 if(response.data.errormessage) {
                     alert(response.data.errormessage);
@@ -64,11 +65,11 @@ export default function PatientDetails() {
 
   const onSubmit = async (values) => {
     // Set the age in the values object before sending it to the server
-    // computeAge();
-    // values.age = patientAge;
+    computeAge();
+    values.age = patientAge;
 
     try {
-      const response = await axios.put(`http://localhost:5000/patient/edit/${id}`, values, {
+      const response = await axios.put(`${apiUrl}/patient/edit/${id}`, values, {
         headers: {
           'Content-Type': 'application/json',
         },
