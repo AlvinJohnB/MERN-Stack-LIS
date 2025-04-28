@@ -155,10 +155,7 @@ TestRouter.put('/update-test/:id', async (req, res) => {
   // Route to fetch all packages
 TestRouter.get('/packages/fetch-all', async (req, res) => {
   try {
-    const packages = await Model.PackageModel.find().populate({
-      path: 'tests',
-      model: 'TestModel', // Ensure this matches the name of your TestModel
-    }); // Fetch all tests from the database
+    const packages = await Model.PackageModel.find().populate('tests.test'); // Fetch all tests from the database
     res.json(packages);
   } catch (error) {
     res.json({ error: 'Error fetching packages' });
@@ -170,16 +167,16 @@ TestRouter.get('/packages/fetch-all', async (req, res) => {
   
     try {
       // Find the package by ID and populate the tests field
-      const packageData = await Model.PackageModel.findById(id).populate('tests');
+      const packageData = await Model.PackageModel.findById(id).populate('tests.test');
   
       if (!packageData) {
-        return res.status(404).json({ message: 'Package not found.' });
+        return res.json({ errormessage: 'Package not found.' });
       }
   
-      res.status(200).json({ message: 'Package fetched successfully.', package: packageData });
+      res.json({ message: 'Package fetched successfully.', package: packageData });
     } catch (error) {
       console.error('Error fetching package:', error);
-      res.status(500).json({ error: 'Error fetching package.' });
+      res.json({ errormessage: 'Error fetching package.' });
     }
   });
 

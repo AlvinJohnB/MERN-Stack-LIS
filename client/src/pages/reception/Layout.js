@@ -54,7 +54,7 @@ export default function Layout() {
     >
       <Navbar
           collapseOnSelect
-          expand="xl"
+          expand="lg"
           className='bg-success m-0'
           expanded={expanded} // Control the expanded state
         >

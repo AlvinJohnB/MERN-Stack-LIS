@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, { useContext } from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
 import Signin from './pages/Signin';
 import ProtectedRoute from './components/ProtectedRoute'; // Import ProtectedRoute
@@ -21,6 +21,7 @@ import Tests from './pages/manage/Tests';
 import EditTest from './pages/manage/EditTest'
 import Packages from './pages/manage/Packages'
 import AddPackage from './pages/manage/AddPackage';
+import EditPackage from './pages/manage/EditPackage';
 
 
 function App() {
@@ -28,67 +29,68 @@ function App() {
 
   return (
 
-        <Routes>
+    <Routes>
 
-          <Route path="/signin" element={<Signin />} />
-          <Route path="/signup" element={<Signup />} />
+      <Route path="/signin" element={<Signin />} />
+      <Route path="/signup" element={<Signup />} />
 
-          <Route path='/' element={
-              <ProtectedRoute>
-                {/* Add the component that should be protected here */}
-                <Layout />
-              </ProtectedRoute>
-          }>
-            <Route path="/" element={<PtSreach />} />
-            <Route path="pt-reg" element={<PtReg/>} />
-            <Route path="pt-add-order/:id" element={<PtAddOrder />} />
-            <Route path="orders" element={<Orders />} />
-            <Route path="patient/:id" element={<PatientDetails />} />
-            <Route path="/report" element={<Report />} />
-
-          
-          </Route>
-
-          <Route path='/lab' element={
-              <ProtectedRoute>
-                {/* Add the component that should be protected here */}
-                <LabLayout />
-              </ProtectedRoute>
-          }>
-            <Route path="/lab/:section" element={<SectionTab />} />
-            <Route path="/lab/:section/:orderid" element={<SectionOrder />} />
-            {/* <Route path="orders" element={<h1>Orders Page</h1>} /> */}
-          
-          </Route>
-
-          <Route path='/manage' element={
-              <ProtectedRoute>
-                {/* Add the component that should be protected here */}
-                <ManageLayout />
-              </ProtectedRoute>
-          }>
-            
-            
-            <Route path="/manage/" element={<Tests />} />
-            <Route path="/manage/edit-test/:id" element={<EditTest />} />
-            <Route path="/manage/add-test/" element={<AddTest />} />
-            <Route path="/manage/packages/" element={<Packages />} />
-            <Route path="/manage/add-package/" element={<AddPackage />} />
-            
-          
-          </Route>
-
-          
+      <Route path='/' element={
+        <ProtectedRoute>
+          {/* Add the component that should be protected here */}
+          <Layout />
+        </ProtectedRoute>
+      }>
+        <Route path="/" element={<PtSreach />} />
+        <Route path="pt-reg" element={<PtReg />} />
+        <Route path="pt-add-order/:id" element={<PtAddOrder />} />
+        <Route path="orders" element={<Orders />} />
+        <Route path="patient/:id" element={<PatientDetails />} />
+        <Route path="/report" element={<Report />} />
 
 
-        
-          <Route path="*" element={<NotFound />} />
-        {/* Public Route for Signin */}
-        </Routes>
-       
+      </Route>
+
+      <Route path='/lab' element={
+        <ProtectedRoute>
+          {/* Add the component that should be protected here */}
+          <LabLayout />
+        </ProtectedRoute>
+      }>
+        <Route path="/lab/:section" element={<SectionTab />} />
+        <Route path="/lab/:section/:orderid" element={<SectionOrder />} />
+        {/* <Route path="orders" element={<h1>Orders Page</h1>} /> */}
+
+      </Route>
+
+      <Route path='/manage' element={
+        <ProtectedRoute>
+          {/* Add the component that should be protected here */}
+          <ManageLayout />
+        </ProtectedRoute>
+      }>
 
 
-    
+        <Route path="/manage/" element={<Tests />} />
+        <Route path="/manage/edit-test/:id" element={<EditTest />} />
+        <Route path="/manage/add-test/" element={<AddTest />} />
+        <Route path="/manage/packages/" element={<Packages />} />
+        <Route path="/manage/add-package/" element={<AddPackage />} />
+        <Route path='/manage/edit-package/:id' element={<EditPackage />} />        
+
+
+      </Route>
+
+
+
+
+
+      <Route path="*" element={<NotFound />} />
+      {/* Public Route for Signin */}
+    </Routes>
+
+
+
+
   );
 }
 

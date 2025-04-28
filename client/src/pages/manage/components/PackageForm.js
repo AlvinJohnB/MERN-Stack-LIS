@@ -6,9 +6,10 @@ import { IoIosAddCircleOutline } from "react-icons/io";
 import TestsModal from '../../reception/modals/TestsModal'
 import axios from 'axios'
 
-export default function PackageForm({handleSubmit, type, items, setItems}) {
+export default function PackageForm({handleSubmit, name, type, items, setItems}) {
 
     const navigate = useNavigate();
+    const apiUrl = process.env.REACT_APP_API_URL;
 
     const [modalShown, setModalShown] = useState(false)
     const [tests, setTests] = useState([])
@@ -16,7 +17,7 @@ export default function PackageForm({handleSubmit, type, items, setItems}) {
 
     const fetchTests = async () => {
         try{
-                axios.get(`http://localhost:5000/test/all`) // Use id instead of pId
+                axios.get(`${apiUrl}/test/all`) // Use id instead of pId
                 .then((response) => {
                     if(response.data) {
                       setTests(response.data);
@@ -45,9 +46,6 @@ export default function PackageForm({handleSubmit, type, items, setItems}) {
     }
 
 
-
-    
-
   return (
     <div>
             <form onSubmit={handleSubmit}>
@@ -59,7 +57,7 @@ export default function PackageForm({handleSubmit, type, items, setItems}) {
             <div className="col-12 col-md-5 mx-md-3 mb-4">
                 <div className="form-group">
                 <label htmlFor="name">Profile Name</label>
-                <input required type="text" name="name" className="form-control" id="name" placeholder="Enter test name" />
+                <input defaultValue={name || ''} required type="text" name="name" className="form-control" id="name" placeholder="Enter test name" />
                 </div>
 
                   
@@ -67,7 +65,7 @@ export default function PackageForm({handleSubmit, type, items, setItems}) {
                   <label>Tests</label>
                   <div className="border bg-light rounded">
                   {items.map((item, index) => (
-                      <div key={index} className = 'border-bottom text-center m-0 p-0'> <span>{item.name}</span> <span onClick={() => setItems(items.filter((_, i) => i !== index))} type='button'><CiCircleRemove /></span></div>
+                      <div key={index} className = 'border-bottom text-center m-0 p-0'> <span>{type === 'add' ? item.name : item.test.name}</span> <span onClick={() => setItems(items.filter((_, i) => i !== index))} type='button'><CiCircleRemove /></span></div>
                   ))}
 
                 </div>

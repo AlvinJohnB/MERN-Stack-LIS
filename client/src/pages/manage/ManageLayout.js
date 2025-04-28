@@ -53,7 +53,7 @@ export default function LabLayout() {
           >
             {/* Bootstrap Navbar */}
             
-            <Navbar className="bg-primary m-0" collapseOnSelect expand="xl" expanded={expanded}>
+            <Navbar className="bg-primary m-0" collapseOnSelect expand="lg" expanded={expanded}>
               <Container>
                 <Navbar.Brand className='text-white' href="#home">MyApp</Navbar.Brand>
                 <Navbar.Toggle onClick={() => setExpanded(!expanded)} aria-controls="navbarScroll" />
