@@ -36,6 +36,11 @@ export default function SectionOrder() {
     
       }, [section, orderid])
 
+      const handleResult = (e, id) => {
+        console.log(e.target.value)
+        console.log(id)
+      }
+
 
 if (isLoading) {
     return (
@@ -85,7 +90,13 @@ if (isLoading) {
                 ) : (
                 <tr key={index}>
                     <td>{test.test.name}</td>
-                    <td>___</td>
+                    {!test.test.options ? 
+                      <td>
+                        
+                      </td>
+                    : 
+                      <td><input type='text' onBlur={(e)=>{handleResult(e, test._id)}} defaultValue={test.result || ''} /></td>                    
+                    }
                     <td>{test.test.unit}</td>
                     <td className="text-center">
                     {order.patient.gender === "Male"
