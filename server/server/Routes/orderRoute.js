@@ -1,6 +1,6 @@
 import express from 'express';
 import Model from '../Models/Model.js'; // Assuming you have an OrderModel and ProductModel in your Models
-import mongoose from 'mongoose';
+
 
 const OrderRouter = express.Router();
 
@@ -231,6 +231,95 @@ OrderRouter.get('/section-orders/:section_orderid/:section', async (req, res) =>
 });
 
 
+OrderRouter.get('/get-order-notes/:orderid', async (req, res) => {
+  const { orderid } = req.params;
+  if (!orderid) {
+    return res.status(400).json({ message: 'Order ID is required.' });
+  }
+  try {
+    // Fetch all orders and optionally populate related fields
+    const notes = await Model.OrderNoteModel.find({ order: orderid })
+      .populate('created_by') // Populate user details
+      .sort({ createdAt: -1 }); // Sort by creation date (most recent first)
+
+    res.json({ message: 'Order notes fetched successfully.', notes });
+  } catch (error) {
+    console.error('Error fetching order notes:', error);
+    res.json({ error: 'Error fetching order notes.' });
+  }
+
+})
+
+
+
+
+
+
+// Edit section-order
+  OrderRouter.put('/edit-order/:id/:status', async (req, res) => {
+      const { id, status } = req.params;
+      const { global_comments, performed_by, released_by, pathologist} = req.body;
+    
+      try {
+        // Find the existing order
+        const existingOrder = await Model.SectionOrderModel.findById(id);
+    
+        if (!existingOrder) {
+          return res.json({ errormessage: 'Order not found' });
+        }
+    
+        // Check if there are changes
+        const isChanged =
+          existingOrder.global_comments !== global_comments ||
+          existingOrder.performed_by !== performed_by ||
+          existingOrder.released_by !== released_by ||
+          existingOrder.pathologist !== pathologist ||
+          existingOrder.status !== status;
+    
+        if (!isChanged) {
+          return res.json({ message: 'No changes detected, proceeding' });
+        }
+
+        const updateData = {
+          global_comments,
+          released_by,
+          pathologist,
+          status,
+        };
+
+        // Handle performed_by: delete the field if it's an empty string
+        if (performed_by === '' || performed_by === undefined) {
+          updateData.$unset = { performed_by: '' }; // Use $unset to remove the field
+        } else {
+          updateData.performed_by = performed_by;
+        }
+
+        // Handle released_by: delete the field if it's an empty string
+        if (released_by === '' || released_by === undefined) {
+          updateData.$unset = { released_by: '' }; // Use $unset to remove the field
+        } else {
+          updateData.released_by = released_by;
+        }
+    
+        if (pathologist === '' || pathologist === undefined) {
+          updateData.$unset = { pathologist: '' };
+        } else {
+          updateData.pathologist = pathologist;
+        }
+    
+        // Update the order if changes are detected
+        const updatedOrder = await Model.SectionOrderModel.findByIdAndUpdate(
+          id,
+          updateData,
+          { new: true } // Return the updated document
+        );
+    
+        res.json({ message: 'Test updated successfully', order: updatedOrder });
+      } catch (error) {
+        console.error('Error updating order details:', error);
+        res.json({ error: 'Error updating order details' });
+      }
+    });
 
 
 export default OrderRouter;

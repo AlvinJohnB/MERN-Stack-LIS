@@ -28,6 +28,10 @@ const sectionOrderSchema = new mongoose.Schema(
         }
       }
     ],
+    global_comments: {
+      type: String,
+      default: '',
+    },
    status:{
     type: String,
     default: 'Pending',
@@ -35,14 +39,17 @@ const sectionOrderSchema = new mongoose.Schema(
     performed_by: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
+      default: ''
     },
     released_by: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
+      default: ''
     },
     pathologist: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
+      default: ''
     },
   },
   {
