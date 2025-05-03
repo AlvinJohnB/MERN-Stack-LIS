@@ -144,6 +144,21 @@ export default function TestForm({ handleSubmit, type, test = {} }) {
             </label>
           </div>
 
+          <div className="form-check mt-3">
+            <input
+              type="checkbox"
+              name="isprofile"
+              className="form-check-input"
+              id="isprofile"
+              defaultChecked={test.package || false}
+            />
+            <label className="form-check-label" htmlFor="show">
+              Is a package?
+            </label>
+          </div>
+
+
+
           <div>
             <button type="submit" className="btn btn-primary mt-3">
               {type === 'add' ? 'Add Test' : 'Update Test'}
