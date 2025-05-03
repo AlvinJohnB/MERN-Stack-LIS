@@ -48,8 +48,8 @@ export default function LabLayout() {
               height: '90vh',
               borderRadius: '5px',
               backgroundColor: 'rgba(207, 207, 207, 0.9)',
-              overflowY: 'auto',
-            }}
+              // overflowY: 'auto',
+            }} 
           >
             {/* Bootstrap Navbar */}
             
@@ -90,10 +90,17 @@ export default function LabLayout() {
             </Navbar>
 
 
-            {/* Main Content */}
-            <div className="mt-4">
-              <Outlet />
-            </div>
+                  {/* Main Content */}
+                  <div
+                  style={{
+                    height: '80vh',
+                    borderRadius: '5px',
+                    // backgroundColor: 'rgba(207, 207, 207, 0.9)',
+                    overflowY: 'auto',
+                  }} 
+                  className="mt-4">
+                    <Outlet />
+                  </div>
           </div>
         </div>
   )
