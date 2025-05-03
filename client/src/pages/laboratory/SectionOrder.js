@@ -37,11 +37,29 @@ export default function SectionOrder() {
 
   }, [section, orderid])
 
-  const handleResult = (e, id) => {
+  const handleResult = async (e, id) => {
     console.log(e.target.value)
     console.log(id)
-  }
 
+    try{
+
+      axios.put(`${apiUrl}/test/update-test-result/`, {id: id, result: e.target.value}).then((res) =>{
+        if (res.data.errormessage){
+          alert(res.data.errormessage)
+        }else{
+          console.log(res.data)
+        }
+      })
+
+    }catch(err){
+      console.log(err)
+      alert (`Error occured when updating results`)
+
+    }
+
+
+  }
+    
 
   if (isLoading) {
     return (
@@ -97,27 +115,30 @@ export default function SectionOrder() {
                         </td>)
                         :
                         (<td>
-
-                          <div className="form-group">
+                            <div className="form-group">
                             <select
                               className="form-select"
                               name="section"
                               id="section"
-                              defaultValue={test.section || 'Select one'}
+                              defaultValue={test.result || 'Select one'}
+                              onChange={(e) => {handleResult(e, test._id)}}
                             >
-                              { }
                               <option disabled>Select one</option>
-                              <option value="Chemistry">Chemistry</option>
+                              {test.test.options.split(',').map((option, index) => {
+                                return (
+                                  <option value={option.trim()} key={index}>{option.trim()}</option>
+                                )
+                              })}
+                              {/* <option>{test.test.options}</option> */}
+                              {/* <option value="Chemistry">Chemistry</option>
                               <option value="Hematology">Hematology</option>
                               <option value="Clinical Microscopy">Clinical Microscopy</option>
-                              <option value="Serology">Serology</option>
+                              <option value="Serology">Serology</option> */}
                             </select>
                           </div>
-
-
-
                         </td>)
                       }
+               
                       <td>{test.test.unit}</td>
                       <td className="text-center">
                         {order.patient.gender === "Male"
