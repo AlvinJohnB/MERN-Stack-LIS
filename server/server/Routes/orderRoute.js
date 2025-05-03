@@ -69,15 +69,15 @@ OrderRouter.post('/add-order/:pid/:isDisc/:encoder/', async (req, res, next) => 
 
         if (test.package) {
           // find in packages schema
-          const profile = await Model.PackageModel.findOne({ name: test.testcode }).populate('tests');
+          const profile = await Model.PackageModel.findOne({ name: test.testcode }).populate('tests.test');
  
           if (profile && profile.tests.length > 0) {
             profile.tests.forEach((test) => {
-              if (!sections[test.section]) {
-                sections[test.section] = [];
+              if (!sections[test.test.section]) {
+                sections[test.test.section] = [];
               }
-              sections[test.section].push({
-                test: test._id,
+              sections[test.test.section].push({
+                test: test.test._id,
               });
             });
           }

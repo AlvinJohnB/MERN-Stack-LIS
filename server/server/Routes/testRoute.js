@@ -29,7 +29,7 @@ TestRouter.post('/get-test/:id', async (req, res) => {
 
   // Route to add a new test
 TestRouter.post('/add-test', async (req, res) => {
-  const { testcode, name, price, discounted_price, options, show, reference_value_male, reference_value_female, unit, section } = req.body;
+  const { testcode, name, price, discounted_price, options, isprofile, show, reference_value_male, reference_value_female, unit, section } = req.body;
 
   try {
       // Check if a test with the same testcode already exists
@@ -46,6 +46,7 @@ TestRouter.post('/add-test', async (req, res) => {
           discounted_price,
           options,
           show: show === null ? false : true,
+          package: isprofile === null ? false : true,
           reference_value_male,
           reference_value_female,
           unit,
@@ -69,6 +70,7 @@ TestRouter.put('/update-test/:id', async (req, res) => {
     name,
     price,
     discounted_price,
+    isprofile,
     options,
     show,
     reference_value_male,
@@ -94,6 +96,7 @@ TestRouter.put('/update-test/:id', async (req, res) => {
     existingTest.discounted_price = discounted_price || existingTest.discounted_price;
     existingTest.options = options || existingTest.options;
     existingTest.show = !show ? false : true,
+    existingTest.package = !isprofile ? false : true,
     existingTest.reference_value_male = reference_value_male || existingTest.reference_value_male;
     existingTest.reference_value_female = reference_value_female || existingTest.reference_value_female;
     existingTest.unit = unit || existingTest.unit;
