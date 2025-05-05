@@ -8,6 +8,7 @@ import Button from 'react-bootstrap/Button';
 import Toast from 'react-bootstrap/Toast';
 import Cookies from 'js-cookie'; // Import js-cookie
 import { jwtDecode } from 'jwt-decode';
+import Commentsmodal from './modals/Commentsmodal';
 
 
 export default function SectionOrder() {
@@ -20,21 +21,22 @@ export default function SectionOrder() {
   const [order, setOrder] = useState({});
   const [orderNotes, setOrderNotes] = useState([]);
   const [users, setUsers] = useState([]);
-
   const [performer, setPerformer] = useState('');
   const [pathologist, setPathologist] = useState('');
   const [globalComments, setGlobalComments] = useState('');
+  const [testSelected, setTestSelected] = useState({})
 
   const apiUrl = process.env.REACT_APP_API_URL;
-
-  useEffect(() => {
   
-      const token = Cookies.get('session'); // Retrieve the session cookie
-      if (token) {
-        const decoded = jwtDecode(token); // Decode the JWT token
-        setUser(decoded);
-      }
-    }, [])
+
+  // for comments modal
+  const [modalShown, setModalShown] = useState(false)
+
+  const handleModal = (key, testid, testname) => {
+    setTestSelected({key, testid, testname})
+    setModalShown(!modalShown);
+    
+  }
 
   const fetchOrder = async () => {
     setIsLoading(true);
@@ -42,8 +44,8 @@ export default function SectionOrder() {
     try {
       await axios.get(`${apiUrl}/order/section-orders/${orderid}/${section}`)
         .then((response) => {
-          console.log(response.data.orders)
           setOrder(response.data.orders)
+          console.log("order", order)
         })
     } catch (error) {
       alert('Error fetching order details')
@@ -80,24 +82,31 @@ export default function SectionOrder() {
     }catch(error){
       console.error('Error fetching users:', error);
       alert('Error fetching users')
+    }finally{
+      setIsLoading(false);
     }
 
 
   }
 
+
   useEffect(() => {
-    fetchOrder();
 
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 500); // Simulate a delay for loading state
+      fetchOrder();
+  
+      const token = Cookies.get('session'); // Retrieve the session cookie
+      if (token) {
+        const decoded = jwtDecode(token); // Decode the JWT token
+        setUser(decoded);
+      }
+    }, [])
 
-  }, [section, orderid])
+
+
 
   const handleResult = async (e, id) => {
-    console.log(e.target.value)
-    console.log(id)
 
+    console.log('result', id)
     try{
 
       axios.put(`${apiUrl}/test/update-test-result/`, {id: id, result: e.target.value}).then((res) =>{
@@ -116,6 +125,44 @@ export default function SectionOrder() {
 
 
   }
+
+  const updateComment = async (index, testid, newComment) => {
+    console.log('comment', testid)
+   
+    setOrder(prevOrder => {
+      const updatedTests = [...prevOrder.tests];
+      updatedTests[index] = {
+        ...updatedTests[index],
+        test_comment: newComment
+      };
+
+      return {
+        ...prevOrder,
+        tests: updatedTests
+      };
+    });
+
+  // update DB
+  try{
+
+    axios.put(`${apiUrl}/test/update-test-comment/`, {id: testid, comment: newComment}).then((res) =>{
+      if (res.data.errormessage){
+        alert(res.data.errormessage)
+      }else{
+        console.log(res.data)
+      }
+    })
+
+  }catch(err){
+    console.log(err)
+    alert (`Error occured when updating test comments`)
+
+  }
+
+
+
+  };
+
 
 
   const releaseResult = async () => {
@@ -286,7 +333,23 @@ export default function SectionOrder() {
                           : test.test.reference_value_female}
                       </td>
                       <td className="text-center">
-                        <Button variant="primary" size="sm">View</Button>
+
+                        {test.test_comment ?
+                          <Button onClick={()=> {handleModal(index, test._id, test.test.name)}} className="position-relative" variant="primary" size="sm">
+                              View
+                            <span className="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
+                              <span className="visually-hidden">Comment</span>
+                            </span>
+                          </Button>
+                          :
+                          <Button onClick={()=> {handleModal(index, test._id, test.test.name)}} variant="primary" size="sm">
+                          Add
+                        </Button>
+                        }
+
+                    
+
+
                       </td>
                     </tr>
                   )
@@ -294,6 +357,10 @@ export default function SectionOrder() {
 
             </tbody>
           </Table>
+
+          {/* Comments Modal */}
+          {testSelected && <Commentsmodal updateComment={updateComment} order={order} modalShown={modalShown} testSelected={testSelected} setModalShown={setModalShown} handleModal={handleModal}/>}
+          
 
           <div>
 

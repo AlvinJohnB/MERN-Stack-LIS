@@ -25,6 +25,10 @@ const sectionOrderSchema = new mongoose.Schema(
         result:{
             type: String,
             default: '',
+        },
+        test_comment:{
+          type: String,
+          default: '',
         }
       }
     ],

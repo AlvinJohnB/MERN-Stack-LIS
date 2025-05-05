@@ -74,7 +74,7 @@ export default function Tests() {
           <td className="text-center">{test.unit}</td>
           <td className="text-center">&#8369; {test.price}</td>
           <td className="text-center">&#8369; {test.discounted_price}</td> */}
-          <td className="text-center"><Link to={`/manage/edit-package/${item._id}`}><FaRegEdit /></Link></td> 
+          <td className="text-center"><Link to={`/manage/edit-package/${item._id}`}><FaRegEdit /></Link></td>  
         </tr>
       )): null;
 

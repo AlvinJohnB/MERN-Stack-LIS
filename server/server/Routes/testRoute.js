@@ -207,25 +207,33 @@ TestRouter.get('/packages/fetch-all', async (req, res) => {
       )
     
       res.json(updatedResult)
-  
-    //   // Update the test fields
-    //   existingTest.testcode = testcode || existingTest.testcode;
-    //   existingTest.name = name || existingTest.name;
-    //   existingTest.price = price || existingTest.price;
-    //   existingTest.discounted_price = discounted_price || existingTest.discounted_price;
-    //   existingTest.options = options || existingTest.options;
-    //   existingTest.show = !show ? false : true,
-    //   existingTest.package = !isprofile ? false : true,
-    //   existingTest.reference_value_male = reference_value_male || existingTest.reference_value_male;
-    //   existingTest.reference_value_female = reference_value_female || existingTest.reference_value_female;
-    //   existingTest.unit = unit || existingTest.unit;
-    //   existingTest.section = section || existingTest.section;
-    //   existingTest.isquali = options ? true : false;
-  
-    //   // Save the updated test
-    //   const updatedTest = await existingTest.save();
-    //   res.status(200).json({ message: 'Test updated successfully.', test: updatedTest });
 
+    } catch (error) {
+      console.error('Error updating result:', error);
+      res.status(500).json({ error: 'Error updating test.' });
+    }
+  });
+
+  TestRouter.put('/update-test-comment/', async (req, res) => {
+    const {id, comment} = req.body;
+   
+    const newComment = comment;
+    const nestedID = new mongoose.Types.ObjectId(id);
+  
+    try {
+      // Find the test by ID
+      const existingTest = await Model.SectionOrderModel.findOne({'tests._id': nestedID });
+      if (!existingTest) {
+        return res.json({ errormessage: 'Test result not found.' });
+      }
+
+      const updateComment = await Model.SectionOrderModel.updateOne( 
+        {'tests._id': nestedID },
+        { $set: { 'tests.$[elem].test_comment': newComment } },
+        { arrayFilters: [{ 'elem._id': nestedID }] }
+      )
+    
+      res.json(updateComment)
 
     } catch (error) {
       console.error('Error updating result:', error);
