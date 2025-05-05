@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 
-function Commentsmodal({updateComment, handleModal, order, modalShown, testSelected }) {
+function Commentsmodal({handleCommentListModal, updateComment, handleModal, order, modalShown, testSelected }) {
 
   const [comment, setComment] = useState(testSelected?.key !== undefined && order.tests[testSelected.key]?.test_comment || '')
 
@@ -14,7 +14,7 @@ function Commentsmodal({updateComment, handleModal, order, modalShown, testSelec
     <>
       <Modal
         show={modalShown}
-        onHide={()=> {updateComment(testSelected.key, testSelected.testid, comment)}}
+        onHide={handleModal}
         backdrop="static"
         keyboard={false}
         aria-labelledby="contained-modal-title-vcenter"
@@ -29,7 +29,7 @@ function Commentsmodal({updateComment, handleModal, order, modalShown, testSelec
               
                 <textarea defaultValue={testSelected?.key !== undefined && order.tests[testSelected.key]?.test_comment || ''} onChange={(e) => {handleComment(e)}} className='form-control' rows={3}></textarea>
             </div>
-            <span className='text-decoration-underline badge text-bg-warning' style={{cursor: 'pointer'}}>Show pre-made comments</span>
+            <span onClick={handleCommentListModal} className='text-decoration-underline badge text-bg-warning' style={{cursor: 'pointer'}}>Show pre-made comments</span>
           
         </Modal.Body>
         <Modal.Footer>
@@ -38,9 +38,9 @@ function Commentsmodal({updateComment, handleModal, order, modalShown, testSelec
             Add Comment
           </Button>
 
-          {/* <Button variant="secondary" onClick={()=> {updateComment(testSelected.key, testSelected.testid, comment)}}>
+          <Button variant="secondary" onClick={()=> {updateComment(testSelected.key, testSelected.testid, comment)}}>
             Close
-          </Button> */}
+          </Button>
         </Modal.Footer>
       </Modal>
     </>

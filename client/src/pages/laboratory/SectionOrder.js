@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom';
+import { createSearchParams, useParams } from 'react-router-dom';
 import Spinner from 'react-bootstrap/Spinner';
 import axios from 'axios';
 import moment from 'moment';
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
-import Toast from 'react-bootstrap/Toast';
 import Cookies from 'js-cookie'; // Import js-cookie
 import { jwtDecode } from 'jwt-decode';
 import Commentsmodal from './modals/Commentsmodal';
+import CommentListModal from './modals/CommentListModal';
 
 
 export default function SectionOrder() {
@@ -31,11 +31,18 @@ export default function SectionOrder() {
 
   // for comments modal
   const [modalShown, setModalShown] = useState(false)
+  const [commentlistShown, setCommentListModal] = useState(false)
+  const [commentList, setCommentList] = useState([])
+
 
   const handleModal = (key, testid, testname) => {
     setTestSelected({key, testid, testname})
     setModalShown(!modalShown);
     
+  }
+
+  const handleCommentListModal = () => {
+    setCommentListModal(!commentlistShown)
   }
 
   const fetchOrder = async () => {
@@ -89,10 +96,24 @@ export default function SectionOrder() {
 
   }
 
+  const fetchCommentList = async () => {
+    try {
+      await axios.get(`${apiUrl}/test/comments/fetch-all`)
+        .then((response) => {
+          setCommentList(response.data)
+        })
+    } catch (error) {
+      alert('Error fetching comment list')
+      console.error('Error fetching comment list:', error);
+    }
+  }
+
 
   useEffect(() => {
-
+      
+      fetchCommentList();
       fetchOrder();
+      
   
       const token = Cookies.get('session'); // Retrieve the session cookie
       if (token) {
@@ -106,7 +127,7 @@ export default function SectionOrder() {
 
   const handleResult = async (e, id) => {
 
-    console.log('result', id)
+    
     try{
 
       axios.put(`${apiUrl}/test/update-test-result/`, {id: id, result: e.target.value}).then((res) =>{
@@ -169,10 +190,26 @@ export default function SectionOrder() {
 
   const releaseResult = async () => {
 
-    if(!performer || !pathologist) {
-      alert('Please select a performer and pathologist')
+    let missingFields = [];
+
+    // Check required fields
+    if (!performer) missingFields.push("Performer");
+    if (!pathologist) missingFields.push("Pathologist");
+  
+    // Check if all tests have results
+    const incompleteResults = order.tests.some(test =>
+      test.test.package !== true &&
+      (!test.result || test.result.trim() === '')
+    );
+  
+    if (incompleteResults) missingFields.push("All test results");
+  
+    // If there are any missing fields, show an alert
+    if (missingFields.length > 0) {
+      alert(`Please fill in the following fields before releasing the result:\n- ${missingFields.join('\n- ')}`);
       return;
     }
+
 
     const data = {
       global_comments: globalComments,
@@ -361,8 +398,8 @@ export default function SectionOrder() {
           </Table>
 
           {/* Comments Modal */}
-          {testSelected && <Commentsmodal updateComment={updateComment} order={order} modalShown={modalShown} testSelected={testSelected} setModalShown={setModalShown} handleModal={handleModal}/>}
-          
+          {testSelected && <Commentsmodal handleCommentListModal={handleCommentListModal}  updateComment={updateComment} order={order} modalShown={modalShown} testSelected={testSelected} setModalShown={setModalShown} handleModal={handleModal}/>}
+          <CommentListModal handleCommentListModal={handleCommentListModal} commentlistShown={commentlistShown} setCommentListModal={setCommentListModal} commentList={commentList} />
 
           <div>
 

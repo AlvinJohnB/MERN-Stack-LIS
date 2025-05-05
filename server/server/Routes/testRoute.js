@@ -242,6 +242,83 @@ TestRouter.get('/packages/fetch-all', async (req, res) => {
   });
 
 
+  // Comment List
+
+// Create comment
+TestRouter.post('/create-comment', async (req, res) => {
+  const { comment_code, comment } = req.body;
+
+  if (!comment_code || !comment) {
+    return res.json({ errormessage: 'Comment code and actual comment is required' });
+  }
+
+  try {
+    const existingComment = await Model.CommentListModel.findOne({ comment_code });
+    if (existingComment) {
+      return res.json({ errormessage: 'Comment code exists' });
+    }
+
+    const newComment = new Model.CommentListModel({ comment_code, comment });
+    const savedComment = await newComment.save();
+    res.json({ message: 'Comment created successfully.', comment: savedComment });
+  } catch (error) {
+    console.error('Error creating comment:', error);
+    res.status(500).json({ error: 'Error creating comment.' });
+  }
+});
+
+// Fetch all comments
+TestRouter.get('/comments/fetch-all', async (req, res) => {
+  try {
+    const comments = await Model.CommentListModel.find();
+    res.json(comments);
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching comments.' });
+  }
+});
+
+// Update comment by ID
+TestRouter.put('/comment/update/:id', async (req, res) => {
+  const { comment_code, comment } = req.body;
+
+  try {
+    const updated = await Model.CommentListModel.findByIdAndUpdate(
+      req.params.id,
+      { comment_code, comment },
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.json({ errormessage: 'Comment not found.' });
+    }
+
+    res.json({ message: 'Comment updated successfully.', comment: updated });
+  } catch (error) {
+    console.error('Error updating comment:', error);
+    res.status(500).json({ error: 'Error updating comment.' });
+  }
+});
+
+// Delete comment by ID
+TestRouter.delete('/comment/delete/:id', async (req, res) => {
+  try {
+    const deleted = await Model.CommentListModel.findByIdAndDelete(req.params.id);
+
+    if (!deleted) {
+      return res.status(404).json({ errormessage: 'Comment not found.' });
+    }
+
+    res.json({ message: 'Comment deleted successfully.' });
+  } catch (error) {
+    console.error('Error deleting comment:', error);
+    res.status(500).json({ error: 'Error deleting comment.' });
+  }
+});
+    
+
+  
+
+
 
 
 export default TestRouter;
