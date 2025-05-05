@@ -4,7 +4,7 @@ import Modal from 'react-bootstrap/Modal';
 
 function Commentsmodal({updateComment, handleModal, order, modalShown, testSelected }) {
 
-  const [comment, setComment] = useState('')
+  const [comment, setComment] = useState(testSelected?.key !== undefined && order.tests[testSelected.key]?.test_comment || '')
 
   const handleComment = (e) => {
     setComment(e.target.value)
@@ -14,7 +14,7 @@ function Commentsmodal({updateComment, handleModal, order, modalShown, testSelec
     <>
       <Modal
         show={modalShown}
-        onHide={handleModal}
+        onHide={()=> {updateComment(testSelected.key, testSelected.testid, comment)}}
         backdrop="static"
         keyboard={false}
         aria-labelledby="contained-modal-title-vcenter"
@@ -38,9 +38,9 @@ function Commentsmodal({updateComment, handleModal, order, modalShown, testSelec
             Add Comment
           </Button>
 
-          <Button variant="secondary" onClick={handleModal}>
+          {/* <Button variant="secondary" onClick={()=> {updateComment(testSelected.key, testSelected.testid, comment)}}>
             Close
-          </Button>
+          </Button> */}
         </Modal.Footer>
       </Modal>
     </>

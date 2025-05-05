@@ -157,6 +157,8 @@ export default function SectionOrder() {
     console.log(err)
     alert (`Error occured when updating test comments`)
 
+  }finally{
+    setModalShown(!modalShown);
   }
 
 
