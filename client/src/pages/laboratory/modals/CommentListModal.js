@@ -59,9 +59,9 @@ const filteredComments = commentList.filter((comment) =>
             </thead>
             <tbody>
                 {Array.isArray(commentList) && commentList.length > 0 && filteredComments.map((comment) => (
-                    <tr key={comment._id}>
-                        <td>{comment_code}</td>
-                        <td>{comment}</td>
+                    <tr key={comment._id}> 
+                        <td>{comment.comment_code}</td>
+                        <td>{comment.comment}</td>
                     </tr>
                 ))}
                 

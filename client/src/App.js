@@ -22,7 +22,10 @@ import EditTest from './pages/manage/EditTest'
 import Packages from './pages/manage/Packages'
 import AddPackage from './pages/manage/AddPackage';
 import EditPackage from './pages/manage/EditPackage';
-
+import ManageIndex from './pages/manage/ManageIndex';
+import Comments from './pages/manage/Comments';
+import AddComment from './pages/manage/AddComment'
+import EditComment from './pages/manage/EditComment'
 
 function App() {
   const { isAuthenticated } = useContext(AuthContext);
@@ -70,12 +73,17 @@ function App() {
       }>
 
 
-        <Route path="/manage/" element={<Tests />} />
+        <Route path="/manage/" element={<ManageIndex />} />
+        <Route path="/manage/tests" element={<Tests />} />
         <Route path="/manage/edit-test/:id" element={<EditTest />} />
         <Route path="/manage/add-test/" element={<AddTest />} />
         <Route path="/manage/packages/" element={<Packages />} />
         <Route path="/manage/add-package/" element={<AddPackage />} />
-        <Route path='/manage/edit-package/:id' element={<EditPackage />} />        
+        <Route path='/manage/edit-package/:id' element={<EditPackage />} />   
+        <Route path='/manage/comments' element={<Comments />} />    
+        <Route path='/manage/add-comment' element={<AddComment />} />    
+        <Route path='/manage/edit-comment/:id' element={<EditComment />} />    
+            
 
 
       </Route>

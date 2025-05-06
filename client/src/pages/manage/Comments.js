@@ -10,40 +10,40 @@ import Button from 'react-bootstrap/Button';
 import { IoIosAddCircleOutline } from "react-icons/io";
 
 
-export default function Tests() {
+export default function Comments() {
 
   const navigate = useNavigate()
-  const [packages, setPackages] = useState([])
+  const [comments, setComments] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [pageNumber, setPageNumber] = useState(0);
 
   const [filter, setFilter] = useState('');
   const apiUrl = process.env.REACT_APP_API_URL;
 
-  const filteredTests = packages.filter((item) =>
-    item.name.toLowerCase().includes(filter.toLowerCase())
+  const filteredComments = comments.filter((item) =>
+    item.comment_code.toLowerCase().includes(filter.toLowerCase()) ||
+    item.comment.toLowerCase().includes(filter.toLowerCase())
   );
     
   
   
   const packagesPerPage = 10; 
   const pagesVisited = pageNumber * packagesPerPage;
-  const pageCount = Math.ceil(packages.length / packagesPerPage);
+  const pageCount = Math.ceil(comments.length / packagesPerPage);
   
   const changePage = ({ selected }) => {
     setPageNumber(selected);
   };
 
-  const fetchPackages = async () => {
+  const fetchComments = async () => {
     try{
 
-      const response = await axios.get(`${apiUrl}/test/packages/fetch-all`)
+      const response = await axios.get(`${apiUrl}/test/comments/fetch-all`)
       if(response.data.error){
         alert(response.data.error)
       }
       else{
-        setPackages(response.data)
-        console.log(response.data)
+        setComments(response.data)
         setIsLoading(false)
       }
     }catch{
@@ -54,27 +54,19 @@ export default function Tests() {
   }
   useEffect(()=>{
 
-    fetchPackages()
+    fetchComments()
 
   },[])
 
   
 
-  const displayPackages = packages.length > 0 ? packages
+  const displayComments = comments.length > 0 ? filteredComments
       .slice(pagesVisited, pagesVisited + packagesPerPage)
       .map((item, index) => (
         <tr key={index}>
-          <td className="">{item.name}</td>
-          {/* <td className="">{item.tests}</td> */}
-          <td className="">{item.tests.map(t => t.test.testcode).join(', ')}</td>
-          {/* {/* <td className="text-center">{test.show === true ? <ImCheckboxChecked />: <ImCheckboxUnchecked/>} </td> */}
-          {/* <td className="text-center">{test.section}</td>
-          <td className="text-center">{test.reference_value_male}</td>
-          <td className="text-center">{test.reference_value_female}</td>
-          <td className="text-center">{test.unit}</td>
-          <td className="text-center">&#8369; {test.price}</td>
-          <td className="text-center">&#8369; {test.discounted_price}</td> */}
-          <td className="text-center"><Link to={`/manage/edit-package/${item._id}`}><FaRegEdit /></Link></td>  
+          <td className="">{item.comment_code}</td>
+          <td className="">{item.comment}</td>
+          <td className="text-center"><Link to={`/manage/edit-comment/${item._id}`}><FaRegEdit /></Link></td>  
         </tr>
       )): null;
 
@@ -92,25 +84,25 @@ export default function Tests() {
 
   return (
     <div className = 'container-fluid mt-4'>
-        <h4 align="center" className='fw-bold text-decoration-underline' >Manage Package and Profiles</h4>
+        <h4 align="center" className='fw-bold text-decoration-underline' >Manage Test Comments</h4>
 
         <div className = "d-flex justify-content-between">
 
         <div className="mb-3 col-md-3">
             <label htmlFor="search" className="form-label">
-              Search Package:
+              Search Comment:
             </label>
             <input
               type="text"
               id="search"
               className="form-control border-secondary"
-              placeholder="Search package..."
+              placeholder="Search comment..."
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
             />
           </div>
           <div className ='align-self-end mb-3'>
-            <Button variant="primary" size="sm" onClick={() => {navigate('/manage/add-package')}}><IoIosAddCircleOutline /> Add Package</Button>
+            <Button variant="primary" size="sm" onClick={() => {navigate('/manage/add-comment')}}><IoIosAddCircleOutline /> Add Comment</Button>
           </div>
 
         </div>
@@ -122,12 +114,12 @@ export default function Tests() {
         <Table size='xl' hover bordered responsive>
         <thead className="table-secondary">
           <tr>
-            <th className="">Test Pofile</th>
-            <th className="">Tests</th>
+            <th className="text-center">Code</th>
+            <th className="text-center">Comment</th>
             <th className="text-center">Action</th>
           </tr>
         </thead>
-        <tbody>{packages.length > 0 && displayPackages}</tbody>
+        <tbody>{comments.length > 0 && displayComments}</tbody>
       </Table>
 
       {pageCount > 1 && (

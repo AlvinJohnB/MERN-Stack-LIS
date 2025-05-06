@@ -92,7 +92,7 @@ export default function Tests() {
 
   return (
     <div className = 'container-fluid mt-4'>
-        <h4 align="center">Tests list</h4>
+        <h4 align="center" className='fw-bold text-decoration-underline'>Manage Tests</h4>
 
         <div className = "d-flex justify-content-between">
 
