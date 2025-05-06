@@ -170,6 +170,27 @@ OrderRouter.get('/all-orders', async (req, res) => {
   }
 });
 
+//fetch order by ID
+OrderRouter.get('/:id', async (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    return res.json({ errormessage: 'ID is required.' });
+  }
+  try {
+    // Fetch all orders and optionally populate related fields
+    const order = await Model.OrderModel.findById(id)
+      .populate('patient') // Populate patient details
+      .populate('tests.test')
+      .sort({ createdAt: -1 }); // Sort by creation date (most recent first)
+
+    res.json({ message: 'Orders fetched successfully.', order });
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+    res.json({ error: 'Error fetching order.' });
+  }
+});
+
+
 //fetch section orders
 OrderRouter.get('/section-orders/:section', async (req, res) => {
   const { section } = req.params;
@@ -198,6 +219,33 @@ OrderRouter.get('/section-orders/:section', async (req, res) => {
   }
 });
 
+// Fetch section orders by ID
+OrderRouter.get('/s-order/:id', async (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    return res.status(400).json({ message: 'ID is required.' });
+  }
+  try {
+    // Fetch all orders and optionally populate related fields
+    const sectionOrders = await Model.SectionOrderModel.find({ labnumber: id })
+      .populate('tests') // Populate test details
+      .populate('tests.test') // Populate test details
+      .populate('patient', 'firstname lastname middlename pid') // Populate patient details
+      // .populate({
+      //   path: 'labnumber',
+      //   populate: {
+      //     path: 'tests.test',
+      //     select: 'testcode testname section', // Populate labnumber.tests.test details
+      //   },
+      // }) // Populate labnumber and its tests
+      .sort({ createdAt: -1 }); // Sort by creation date (most recent first)
+
+    res.json(sectionOrders);
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+    res.json({ error: 'Error fetching orders.' });
+  }
+});
 
 // fetch section orders by id
 OrderRouter.get('/section-orders/:section_orderid/:section', async (req, res) => {

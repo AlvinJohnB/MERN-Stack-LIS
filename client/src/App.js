@@ -26,6 +26,7 @@ import ManageIndex from './pages/manage/ManageIndex';
 import Comments from './pages/manage/Comments';
 import AddComment from './pages/manage/AddComment'
 import EditComment from './pages/manage/EditComment'
+import ResultsIndex from './pages/results/ResultsIndex';
 
 function App() {
   const { isAuthenticated } = useContext(AuthContext);
@@ -49,6 +50,7 @@ function App() {
         <Route path="orders" element={<Orders />} />
         <Route path="patient/:id" element={<PatientDetails />} />
         <Route path="/report" element={<Report />} />
+        <Route path="/result/:id" element={<ResultsIndex />} />
 
 
       </Route>

@@ -3,15 +3,17 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Table from 'react-bootstrap/Table';
 import moment from 'moment';
+import { useNavigate } from 'react-router-dom';
 
 function OrderDetailsModal({ orderDetails, handleDetailModal, detailModalShown }) {
 
-    useEffect(() => {
-        if (detailModalShown) {
-          // Add your custom logic here, e.g., fetching additional details
-          console.log(orderDetails)
-        }
-      }, [detailModalShown, orderDetails]);
+    const navigate = useNavigate();
+    // useEffect(() => {
+    //     if (detailModalShown) {
+    //       // Add your custom logic here, e.g., fetching additional details
+    //       console.log(orderDetails)
+    //     }
+    //   }, [detailModalShown, orderDetails]);
 
   return (
     <>
@@ -62,7 +64,7 @@ function OrderDetailsModal({ orderDetails, handleDetailModal, detailModalShown }
           <Button variant="primary">
             Print Charge Slip
           </Button>
-          <Button variant="success" className="ms-2">
+          <Button onClick={() => {navigate(`/result/${orderDetails._id}`)}} variant="success" className="ms-2">
             Print Results
           </Button>
 
