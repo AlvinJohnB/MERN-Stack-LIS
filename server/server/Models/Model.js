@@ -6,6 +6,7 @@ import OrderNoteModel from './ordernoteSchema.js';
 import DiagnosisModel from './dxSchema.js';
 import SectionOrderModel from './sectionOrderSchema.js';
 import PackageModel from './packageSchema.js';
+import CommentListModel from './commentlistSchema.js'
 
 export default {
   UserModel,
@@ -16,4 +17,5 @@ export default {
   DiagnosisModel,
   SectionOrderModel,
   PackageModel,
+  CommentListModel
 };

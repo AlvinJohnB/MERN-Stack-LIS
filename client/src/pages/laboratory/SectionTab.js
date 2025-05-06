@@ -9,7 +9,7 @@ import Button from 'react-bootstrap/Button';
 import axios from 'axios';
 import moment from 'moment';
 import { useNavigate } from 'react-router-dom';
-
+import { FaRegEdit } from "react-icons/fa";
 
 
 export default function SectionTab() {
@@ -72,7 +72,6 @@ export default function SectionTab() {
   };
 
   const handleDetail = (order, section) => {
-    console.log(order._id, section);
     navigate(`/lab/${section}/${order._id}`)
   }
 
@@ -85,9 +84,13 @@ export default function SectionTab() {
         <td className="">{order.labnumber.tests.filter(t => t.test.section === section).map(t => t.test.testcode).join(', ')}</td>
         <td className="text-center">{moment(order.createdAt).format('MMMM DD, YYYY')}</td>
         <td className="text-center">
-          <Button onClick={() => { handleDetail(order, section); }} variant="primary" size="sm">
-            View
-          </Button>
+
+          <span onClick={() => { handleDetail(order, section); }} style={{cursor: 'pointer'}}> <FaRegEdit /></span>
+
+          
+          {/* <Button className='text-center' onClick={() => { handleDetail(order, section); }} variant="primary" size="sm">
+          <FaRegEdit />
+          </Button> */}
         </td>
       </tr>
     )): null;

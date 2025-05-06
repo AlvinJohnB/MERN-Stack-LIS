@@ -207,31 +207,116 @@ TestRouter.get('/packages/fetch-all', async (req, res) => {
       )
     
       res.json(updatedResult)
-  
-    //   // Update the test fields
-    //   existingTest.testcode = testcode || existingTest.testcode;
-    //   existingTest.name = name || existingTest.name;
-    //   existingTest.price = price || existingTest.price;
-    //   existingTest.discounted_price = discounted_price || existingTest.discounted_price;
-    //   existingTest.options = options || existingTest.options;
-    //   existingTest.show = !show ? false : true,
-    //   existingTest.package = !isprofile ? false : true,
-    //   existingTest.reference_value_male = reference_value_male || existingTest.reference_value_male;
-    //   existingTest.reference_value_female = reference_value_female || existingTest.reference_value_female;
-    //   existingTest.unit = unit || existingTest.unit;
-    //   existingTest.section = section || existingTest.section;
-    //   existingTest.isquali = options ? true : false;
-  
-    //   // Save the updated test
-    //   const updatedTest = await existingTest.save();
-    //   res.status(200).json({ message: 'Test updated successfully.', test: updatedTest });
-
 
     } catch (error) {
       console.error('Error updating result:', error);
       res.status(500).json({ error: 'Error updating test.' });
     }
   });
+
+  TestRouter.put('/update-test-comment/', async (req, res) => {
+    const {id, comment} = req.body;
+   
+    const newComment = comment;
+    const nestedID = new mongoose.Types.ObjectId(id);
+  
+    try {
+      // Find the test by ID
+      const existingTest = await Model.SectionOrderModel.findOne({'tests._id': nestedID });
+      if (!existingTest) {
+        return res.json({ errormessage: 'Test result not found.' });
+      }
+
+      const updateComment = await Model.SectionOrderModel.updateOne( 
+        {'tests._id': nestedID },
+        { $set: { 'tests.$[elem].test_comment': newComment } },
+        { arrayFilters: [{ 'elem._id': nestedID }] }
+      )
+    
+      res.json(updateComment)
+
+    } catch (error) {
+      console.error('Error updating result:', error);
+      res.status(500).json({ error: 'Error updating test.' });
+    }
+  });
+
+
+  // Comment List
+
+// Create comment
+TestRouter.post('/create-comment', async (req, res) => {
+  const { comment_code, comment } = req.body;
+
+  if (!comment_code || !comment) {
+    return res.json({ errormessage: 'Comment code and actual comment is required' });
+  }
+
+  try {
+    const existingComment = await Model.CommentListModel.findOne({ comment_code });
+    if (existingComment) {
+      return res.json({ errormessage: 'Comment code exists' });
+    }
+
+    const newComment = new Model.CommentListModel({ comment_code, comment });
+    const savedComment = await newComment.save();
+    res.json({ message: 'Comment created successfully.', comment: savedComment });
+  } catch (error) {
+    console.error('Error creating comment:', error);
+    res.status(500).json({ error: 'Error creating comment.' });
+  }
+});
+
+// Fetch all comments
+TestRouter.get('/comments/fetch-all', async (req, res) => {
+  try {
+    const comments = await Model.CommentListModel.find();
+    res.json(comments);
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching comments.' });
+  }
+});
+
+// Update comment by ID
+TestRouter.put('/comment/update/:id', async (req, res) => {
+  const { comment_code, comment } = req.body;
+
+  try {
+    const updated = await Model.CommentListModel.findByIdAndUpdate(
+      req.params.id,
+      { comment_code, comment },
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.json({ errormessage: 'Comment not found.' });
+    }
+
+    res.json({ message: 'Comment updated successfully.', comment: updated });
+  } catch (error) {
+    console.error('Error updating comment:', error);
+    res.status(500).json({ error: 'Error updating comment.' });
+  }
+});
+
+// Delete comment by ID
+TestRouter.delete('/comment/delete/:id', async (req, res) => {
+  try {
+    const deleted = await Model.CommentListModel.findByIdAndDelete(req.params.id);
+
+    if (!deleted) {
+      return res.status(404).json({ errormessage: 'Comment not found.' });
+    }
+
+    res.json({ message: 'Comment deleted successfully.' });
+  } catch (error) {
+    console.error('Error deleting comment:', error);
+    res.status(500).json({ error: 'Error deleting comment.' });
+  }
+});
+    
+
+  
 
 
 
