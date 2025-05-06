@@ -15,10 +15,6 @@ const filteredComments = commentList.filter((comment) =>
 );
 
 
-  const handleComment = (e) => {
-    setComment(e.target.value)
-  }
-
   return (
     <>
       <Modal
