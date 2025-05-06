@@ -277,6 +277,18 @@ TestRouter.get('/comments/fetch-all', async (req, res) => {
   }
 });
 
+// Fetch all comments
+TestRouter.post('/comments/fetch/:id', async (req, res) => {
+  const { id } = req.params
+  try {
+    const comment = await Model.CommentListModel.findById(id);
+    res.json(comment);
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching comments.' });
+  }
+});
+
+
 // Update comment by ID
 TestRouter.put('/comment/update/:id', async (req, res) => {
   const { comment_code, comment } = req.body;
