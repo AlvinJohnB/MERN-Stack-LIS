@@ -1,4 +1,3 @@
-
 import mongoose from 'mongoose';
 
 const sectionOrderSchema = new mongoose.Schema(
@@ -12,9 +11,9 @@ const sectionOrderSchema = new mongoose.Schema(
       ref: 'Patient',
       required: true,
     },
-    section:{
-        type: String,
-        required: true,
+    section: {
+      type: String,
+      required: true,
     },
     tests: [
       {
@@ -22,38 +21,35 @@ const sectionOrderSchema = new mongoose.Schema(
           type: mongoose.Schema.Types.ObjectId,
           ref: 'Test',
         },
-        result:{
-            type: String,
-            default: '',
-        },
-        test_comment:{
+        result: {
           type: String,
           default: '',
-        }
-      }
+        },
+        test_comment: {
+          type: String,
+          default: '',
+        },
+      },
     ],
     global_comments: {
       type: String,
       default: '',
     },
-   status:{
-    type: String,
-    default: 'Pending',
-   },
+    status: {
+      type: String,
+      default: 'Pending',
+    },
     performed_by: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      default: ''
     },
     released_by: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      default: ''
     },
     pathologist: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      default: ''
     },
   },
   {
